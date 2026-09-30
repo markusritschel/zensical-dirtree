@@ -1,0 +1,64 @@
+"""Copy the bundled assets into a docs directory.
+
+Zensical does not load third-party plugins, so the stylesheet and script live
+in the docs directory like any other custom asset:
+
+    zensical-dirtree install [--docs-dir docs]
+"""
+
+from __future__ import annotations
+
+import argparse
+import shutil
+import sys
+from pathlib import Path
+
+from zensical_dirtree import ASSETS, asset_path
+
+#: Conventional locations, matching the theme's own documentation.
+SUBDIRS = {".css": "stylesheets", ".js": "javascripts"}
+
+
+def install(docs_dir: Path) -> int:
+    if not docs_dir.is_dir():
+        print(f"No such directory: {docs_dir.resolve()}", file=sys.stderr)
+        print("Pass your docs directory, e.g. --docs-dir docs", file=sys.stderr)
+        return 1
+
+    for name in ASSETS:
+        target = docs_dir / SUBDIRS[Path(name).suffix] / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(asset_path(name), target)
+        print(f"Wrote {target}")
+
+    print(
+        "\nNow add to zensical.toml:\n\n"
+        "  [project]\n"
+        '  extra_css = ["stylesheets/dirtree.css"]\n'
+        '  extra_javascript = ["javascripts/dirtree.js"]\n'
+        '  watch = ["snippets"]   # your base_path, so body edits rebuild\n\n'
+        "  [project.markdown_extensions.zensical_dirtree]\n"
+        '  base_path = "snippets"\n'
+    )
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="zensical-dirtree",
+        description="Utilities for the zensical-dirtree Markdown extension.",
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+    installer = sub.add_parser("install", help="copy assets into a docs directory")
+    installer.add_argument(
+        "--docs-dir",
+        default="docs",
+        type=Path,
+        help="path to the docs directory (default: docs)",
+    )
+    args = parser.parse_args(argv)
+    return install(args.docs_dir)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
