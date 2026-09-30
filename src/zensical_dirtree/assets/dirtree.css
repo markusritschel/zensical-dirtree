@@ -371,11 +371,17 @@
 .dirtree__dot {
   --dirtree-badge: var(--dirtree-grey);
   flex: none;
-  width: 0.35rem;
-  height: 0.35rem;
+  width: 0.26rem;
+  height: 0.26rem;
   margin-left: auto;
   border-radius: 50%;
   background: var(--dirtree-badge);
+  opacity: 0.6;
+}
+
+.dirtree__row:hover .dirtree__dot,
+[aria-selected="true"] > .dirtree__row .dirtree__dot {
+  opacity: 1;
 }
 
 .dirtree__badge--green {
