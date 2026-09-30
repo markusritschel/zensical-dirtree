@@ -130,10 +130,13 @@
       });
     }
 
-    // Breadcrumbs and "Contents" lists link to sibling panels.
+    // Breadcrumbs and "Contents" lists link to sibling panels. Instant
+    // navigation rewrites hrefs to absolute URLs, so compare the parts.
     root.querySelector(".dirtree__panels").addEventListener("click", (event) => {
-      const a = event.target.closest(`a[href^="#${PREFIX}"]`);
-      const li = a && byId(a.getAttribute("href").slice(1 + PREFIX.length));
+      const a = event.target.closest("a[href]");
+      if (!a || a.pathname !== location.pathname) return;
+      if (!a.hash.startsWith(`#${PREFIX}`)) return;
+      const li = byId(decodeURIComponent(a.hash.slice(1 + PREFIX.length)));
       if (!li) return;
       event.preventDefault();
       select(li, { focus: true });
