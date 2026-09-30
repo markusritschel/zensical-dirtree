@@ -410,8 +410,8 @@ class _Renderer:
             f'<span class="dirtree__row" style="--dirtree-depth: {depth}">{arrow}'
             f'<a class="dirtree__link" href="#{PREFIX}{node.id}">'
             f"{_icon(self.icon_for(node))}"
-            f'<span class="dirtree__label">{escape(node.label)}</span></a></span>'
-            f"{group}</li>"
+            f'<span class="dirtree__label">{escape(node.label)}</span></a>'
+            f"{self.dot(node)}</span>{group}</li>"
         )
 
     def panel(self, node: Node, root: str | None) -> str:
@@ -477,22 +477,40 @@ class _Renderer:
     def summary(self, node: Node) -> str:
         return self.inline(node.spec["summary"])
 
-    def badge(self, key: str, node: Node) -> str:
+    def badge_conf(self, key: str, node: Node) -> dict[str, Any]:
         conf = self.ext.badges[key]
         if not isinstance(conf, dict):
             raise self.error(f"badge '{key}' must be configured as {{label, color}}")
-        label = escape(str(conf.get("label", key)))
-        colour = str(conf.get("color", "grey"))
+        if not isinstance(conf.get("indicator", False), bool):
+            raise self.error(f"badge '{key}': 'indicator' must be true or false")
+        return conf
+
+    def badge_colour(self, key: str, node: Node) -> tuple[str, str]:
+        """Return the extra class and style attribute carrying a badge's colour."""
+        colour = str(self.badge_conf(key, node).get("color", "grey"))
         if colour in NAMED_COLOURS:
-            return (
-                f'<span class="dirtree__badge dirtree__badge--{colour}">{label}</span>'
-            )
+            return f" dirtree__badge--{colour}", ""
         if not COLOUR_RE.match(colour):
             raise self.error(f"badge '{key}' has an unsafe colour {colour!r}", node)
-        return (
-            f'<span class="dirtree__badge" style="--dirtree-badge: {colour}">'
-            f"{label}</span>"
-        )
+        return "", f' style="--dirtree-badge: {colour}"'
+
+    def badge(self, key: str, node: Node) -> str:
+        label = escape(str(self.badge_conf(key, node).get("label", key)))
+        extra, style = self.badge_colour(key, node)
+        return f'<span class="dirtree__badge{extra}"{style}>{label}</span>'
+
+    def dot(self, node: Node) -> str:
+        """Status dot for the tree row: the node's first indicator badge."""
+        for key in map(str, node.spec.get("badges", [])):
+            conf = self.badge_conf(key, node)
+            if conf.get("indicator"):
+                label = escape(str(conf.get("label", key)), quote=True)
+                extra, style = self.badge_colour(key, node)
+                return (
+                    f'<span class="dirtree__dot{extra}"{style} title="{label}">'
+                    f'<span class="dirtree__sr">{label}</span></span>'
+                )
+        return ""
 
     def body(self, node: Node) -> str:
         if "body" in node.spec:

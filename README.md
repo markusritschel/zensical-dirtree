@@ -36,8 +36,8 @@ watch = ["snippets"]            # same as base_path; see below
 
 [project.markdown_extensions.zensical_dirtree]
 base_path = "snippets"          # where body_file paths resolve; outside docs/
-badges.committed = { label = "committed", color = "green" }
-badges.gitignored = { label = "gitignored", color = "orange" }
+badges.committed = { label = "committed", color = "green", indicator = true }
+badges.gitignored = { label = "gitignored", color = "orange", indicator = true }
 badges.generated = { label = "generated", color = "amber" }
 ```
 
@@ -64,6 +64,13 @@ Things to know:
 Named colours adapt to light and dark mode: `green`, `orange`, `amber`, `red`,
 `blue`, `purple`, `grey` (the default). Any other value is used as a raw CSS
 colour, e.g. `color = "#0e7490"` or `color = "rgb(14 116 144)"`.
+
+### Status dots
+
+Badges with `indicator = true` also appear as a coloured dot at the right edge
+of the node's row in the tree, like a git status marker. If a node has several
+indicator badges, the first one listed on the node is shown. The dot's tooltip
+is the badge label, which screen readers also announce with the item.
 
 ### Icon colours
 

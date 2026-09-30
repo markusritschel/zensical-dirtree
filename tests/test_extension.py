@@ -245,6 +245,70 @@ def test_badges_share_the_title_line():
     assert re.search(r"dirtree__title.*dirtree__badges.*committed", head.group(1))
 
 
+INDICATOR_BADGES = {
+    "plain": {"label": "plain", "color": "blue"},
+    "committed": {"label": "committed", "color": "green", "indicator": True},
+    "gitignored": {"label": "gitignored", "color": "orange", "indicator": True},
+    "local": {"label": "local only", "color": "#0e7490", "indicator": True},
+}
+
+
+def tree_row(html: str, node: str) -> str:
+    return re.search(
+        rf'data-node="{node}">\s*<span class="dirtree__row".*?</span>\s*</a>'
+        r"(.*?)</span>(?:<ul|</li>)",
+        html,
+        re.S,
+    ).group(1)
+
+
+def test_indicator_badge_shows_dot_in_tree_row():
+    html = render(
+        tree("nodes:\n  - label: a.py\n    badges: [committed]\n"),
+        badges=INDICATOR_BADGES,
+    )
+    row = tree_row(html, "a-py")
+    assert 'class="dirtree__dot dirtree__badge--green" title="committed"' in row
+    # Screen readers hear the status as part of the item.
+    assert '<span class="dirtree__sr">committed</span>' in row
+
+
+def test_plain_badge_shows_no_dot():
+    html = render(
+        tree("nodes:\n  - label: a.py\n    badges: [plain]\n"),
+        badges=INDICATOR_BADGES,
+    )
+    assert "dirtree__dot" not in html
+
+
+def test_first_indicator_badge_wins():
+    html = render(
+        tree("nodes:\n  - label: a/\n    badges: [plain, gitignored, committed]\n"),
+        badges=INDICATOR_BADGES,
+    )
+    row = tree_row(html, "a")
+    assert row.count("dirtree__dot") == 1
+    assert 'title="gitignored"' in row
+
+
+def test_indicator_with_raw_colour():
+    html = render(
+        tree("nodes:\n  - label: a\n    badges: [local]\n"),
+        badges=INDICATOR_BADGES,
+    )
+    assert 'class="dirtree__dot" style="--dirtree-badge: #0e7490"' in tree_row(
+        html, "a"
+    )
+
+
+def test_indicator_must_be_boolean():
+    with pytest.raises(DirtreeError, match="indicator"):
+        render(
+            tree("nodes:\n  - label: a\n    badges: [x]\n"),
+            badges={"x": {"color": "green", "indicator": "yes"}},
+        )
+
+
 def test_raw_colour_badge():
     html = render(tree("nodes:\n  - label: a\n    badges: [custom]\n"))
     assert 'style="--dirtree-badge: #123abc"' in html

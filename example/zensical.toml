@@ -64,7 +64,8 @@ custom_checkbox = true
 
 [project.markdown_extensions.zensical_dirtree]
 base_path = "snippets"
-badges.committed = { label = "committed", color = "green" }
-badges.gitignored = { label = "gitignored", color = "orange" }
+# indicator = true also shows the badge as a status dot in the tree.
+badges.committed = { label = "committed", color = "green", indicator = true }
+badges.gitignored = { label = "gitignored", color = "orange", indicator = true }
 badges.generated = { label = "generated", color = "amber" }
 badges.local = { label = "local only", color = "#0e7490" }

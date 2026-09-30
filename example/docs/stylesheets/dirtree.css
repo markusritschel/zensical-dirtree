@@ -185,6 +185,10 @@
   text-decoration: none;
 }
 
+.dirtree__link:has(+ .dirtree__dot) {
+  margin-right: 0.5rem;
+}
+
 .dirtree__label {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -362,6 +366,18 @@
   text-transform: uppercase;
 }
 
+/* Status dot at the right edge of a tree row, for indicator badges. Declared
+   before the colour modifiers, which it shares with badges. */
+.dirtree__dot {
+  --dirtree-badge: var(--dirtree-grey);
+  flex: none;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--dirtree-badge);
+}
+
 .dirtree__badge--green {
   --dirtree-badge: var(--dirtree-green);
 }
@@ -471,7 +487,8 @@
   font-size: 0.65rem;
 }
 
-.dirtree__live {
+.dirtree__live,
+.dirtree__sr {
   position: absolute;
   width: 1px;
   height: 1px;
