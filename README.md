@@ -65,6 +65,23 @@ Named colours adapt to light and dark mode: `green`, `orange`, `amber`, `red`,
 `blue`, `purple`, `grey` (the default). Any other value is used as a raw CSS
 colour, e.g. `color = "#0e7490"` or `color = "rgb(14 116 144)"`.
 
+### Icon colours
+
+Icons are coloured by type, with light and dark values. Override the custom
+properties in a stylesheet of your own to match your palette:
+
+```css
+.dirtree {
+  --dirtree-icon-folder: #c98a1a;
+  --dirtree-icon-code: #2f76c4;
+  --dirtree-icon-config: #6b7689;
+  --dirtree-icon-md: #8a5fd1;
+  --dirtree-icon-file: #7d8590;
+}
+```
+
+For dark mode, set them under `[data-md-color-scheme="slate"] .dirtree`.
+
 ## Syntax
 
 Use four backticks for the outer fence so bodies can contain ordinary

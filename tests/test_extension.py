@@ -438,6 +438,16 @@ def test_icons():
         ), node
 
 
+def test_icon_outlines_can_be_tinted():
+    # The stylesheet colours icons by type and tints this outline path.
+    html = render(tree("nodes:\n  - label: src/\n  - label: a.py\n"))
+    for icon in ("folder", "code"):
+        svg = re.search(
+            rf'<svg class="dirtree__icon dirtree__icon--{icon}".*?</svg>', html
+        )
+        assert 'class="dirtree__icon-bg"' in svg.group(0), icon
+
+
 def test_invalid_icon_is_error():
     with pytest.raises(DirtreeError, match="icon"):
         render(tree("nodes:\n  - label: a\n    icon: rocket\n"))

@@ -72,13 +72,15 @@ FALLBACK_EXTENSIONS = [
     "pymdownx.superfences",
 ]
 
+#: The outline path carries ``dirtree__icon-bg`` so the stylesheet can tint it.
 _FILE = (
-    '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'
+    '<path class="dirtree__icon-bg" '
+    'd="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'
     '<path d="M14 3v5h5"/>'
 )
 ICONS = {
     "folder": (
-        '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8'
+        '<path class="dirtree__icon-bg" d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8'
         'a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'
     ),
     "file": _FILE,
