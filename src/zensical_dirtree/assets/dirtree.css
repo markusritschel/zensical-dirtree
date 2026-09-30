@@ -1,0 +1,349 @@
+/* zensical-dirtree: layout and theme for the [data-dirtree] widget.
+ * Colours come from the theme's variables, so light/dark and custom palettes
+ * follow automatically. Only the badge palette is defined here. */
+
+.dirtree {
+  --dirtree-border: var(--md-default-fg-color--lightest);
+  --dirtree-green: #1a7f37;
+  --dirtree-orange: #c2410c;
+  --dirtree-amber: #9a6700;
+  --dirtree-red: #cf222e;
+  --dirtree-blue: #0969da;
+  --dirtree-purple: #8250df;
+  --dirtree-grey: #57606a;
+  margin: 1.5em 0;
+  border: 1px solid var(--dirtree-border);
+  border-radius: 0.4rem;
+}
+
+[data-md-color-scheme="slate"] .dirtree {
+  --dirtree-green: #3fb950;
+  --dirtree-orange: #fb923c;
+  --dirtree-amber: #d29922;
+  --dirtree-red: #f85149;
+  --dirtree-blue: #58a6ff;
+  --dirtree-purple: #bc8cff;
+  --dirtree-grey: #8b949e;
+}
+
+/* Two columns only once the script runs; without it the widget reads as a
+   nested list followed by every node's description. */
+.dirtree--js {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  overflow: hidden;
+}
+
+/* -- tree -------------------------------------------------------------- */
+
+.dirtree__side {
+  padding: 0.5rem 0;
+  background: var(--md-code-bg-color);
+  border-bottom: 1px solid var(--dirtree-border);
+}
+
+.dirtree--js .dirtree__side {
+  border-bottom: 0;
+  border-right: 1px solid var(--dirtree-border);
+  overflow: auto;
+}
+
+.dirtree__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.4rem;
+  padding: 0 0.6rem 0.3rem 0.8rem;
+}
+
+.dirtree__root {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.dirtree__toggle-all {
+  margin-left: auto;
+  padding: 0.1rem 0.3rem;
+  border: 0;
+  border-radius: 0.2rem;
+  background: none;
+  color: var(--md-typeset-a-color);
+  font: inherit;
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+
+.dirtree__toggle-all:hover,
+.dirtree__toggle-all:focus-visible {
+  background: var(--dirtree-border);
+}
+
+.md-typeset .dirtree .dirtree__tree ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-typeset .dirtree .dirtree__tree ul ul {
+  padding-left: 0.9rem;
+}
+
+.md-typeset .dirtree .dirtree__tree li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dirtree__row {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin: 0 0.3rem;
+  padding: 0.12rem 0.4rem 0.12rem 0.2rem;
+  border-radius: 0.2rem;
+}
+
+.dirtree--js .dirtree__row {
+  cursor: pointer;
+}
+
+.dirtree--js .dirtree__row:hover {
+  background: var(--dirtree-border);
+}
+
+.dirtree [aria-selected="true"] > .dirtree__row {
+  background: var(--md-accent-fg-color--transparent);
+  color: var(--md-accent-fg-color);
+}
+
+.dirtree [role="treeitem"]:focus {
+  outline: none;
+}
+
+.dirtree [role="treeitem"]:focus-visible > .dirtree__row {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: -2px;
+}
+
+.md-typeset .dirtree .dirtree__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  color: inherit;
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+  text-decoration: none;
+}
+
+.dirtree__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dirtree__arrow {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.dirtree--js .dirtree__arrow--folder::before {
+  content: "";
+  padding: 0.1rem;
+  border: solid currentcolor;
+  border-width: 0 0.09rem 0.09rem 0;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+
+.dirtree--js [aria-expanded="true"] > .dirtree__row .dirtree__arrow--folder::before {
+  transform: rotate(45deg);
+}
+
+.dirtree--js [aria-expanded="false"] > ul {
+  display: none;
+}
+
+.dirtree__icon {
+  flex: none;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.dirtree__icon--folder {
+  color: var(--md-typeset-a-color);
+}
+
+[aria-selected="true"] > .dirtree__row .dirtree__icon {
+  color: inherit;
+}
+
+/* -- panels ------------------------------------------------------------ */
+
+.dirtree__panels {
+  min-width: 0;
+  padding: 0.2rem 1.2rem 0.8rem;
+}
+
+.dirtree--js .dirtree__panels {
+  padding-top: 0.8rem;
+}
+
+.dirtree__panel {
+  padding: 0.8rem 0;
+}
+
+.dirtree__panel + .dirtree__panel {
+  border-top: 1px solid var(--dirtree-border);
+}
+
+.dirtree--js .dirtree__panel {
+  padding: 0;
+  border-top: 0;
+}
+
+.dirtree__panel[hidden] {
+  display: none;
+}
+
+.md-typeset .dirtree .dirtree__crumbs {
+  margin: 0 0 0.4rem;
+  color: var(--md-default-fg-color--light);
+  font-family: var(--md-code-font-family);
+  font-size: 0.65rem;
+}
+
+.dirtree__sep {
+  margin: 0 0.3rem;
+}
+
+.md-typeset .dirtree .dirtree__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-family: var(--md-code-font-family);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.dirtree__title .dirtree__icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.md-typeset .dirtree .dirtree__summary {
+  margin: 0.3rem 0 0.6rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .dirtree .dirtree__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0.5rem 0;
+}
+
+.dirtree__badge {
+  --dirtree-badge: var(--dirtree-grey);
+  padding: 0.05rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--dirtree-badge) 40%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--dirtree-badge) 14%, transparent);
+  color: var(--dirtree-badge);
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.dirtree__badge--green { --dirtree-badge: var(--dirtree-green); }
+.dirtree__badge--orange { --dirtree-badge: var(--dirtree-orange); }
+.dirtree__badge--amber { --dirtree-badge: var(--dirtree-amber); }
+.dirtree__badge--red { --dirtree-badge: var(--dirtree-red); }
+.dirtree__badge--blue { --dirtree-badge: var(--dirtree-blue); }
+.dirtree__badge--purple { --dirtree-badge: var(--dirtree-purple); }
+.dirtree__badge--grey { --dirtree-badge: var(--dirtree-grey); }
+
+.md-typeset .dirtree .dirtree__fields {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.3rem 1rem;
+  margin: 0.7rem 0;
+  padding: 0.5rem 0.8rem;
+  border-left: 0.2rem solid var(--md-accent-fg-color);
+  border-radius: 0.2rem;
+  background: var(--md-code-bg-color);
+}
+
+.dirtree__field {
+  display: contents;
+}
+
+.md-typeset .dirtree .dirtree__fields dt {
+  margin: 0;
+  font-weight: 700;
+}
+
+.md-typeset .dirtree .dirtree__fields dd {
+  margin: 0;
+}
+
+.dirtree__body > :first-child {
+  margin-top: 0.6rem;
+}
+
+.md-typeset .dirtree .dirtree__more {
+  margin: 1rem 0 0;
+}
+
+.md-typeset .dirtree .dirtree__contents-title {
+  margin: 1rem 0 0.3rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.md-typeset .dirtree .dirtree__contents a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+}
+
+.dirtree__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Narrow screens: tree above panel rather than hiding the widget. */
+@media (max-width: 699px) {
+  .dirtree--js {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dirtree--js .dirtree__side {
+    max-height: 50vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--dirtree-border);
+  }
+}
