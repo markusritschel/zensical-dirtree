@@ -158,6 +158,16 @@ def _zensical_context(md: Markdown) -> Any | None:
     return ContextPreprocessor.from_markdown(md)
 
 
+def _highlight(md: Markdown) -> Any | None:
+    """Return the highlight extension SuperFences uses on ``md``."""
+    if "fenced_code_block" not in md.preprocessors:
+        return None
+    fenced = md.preprocessors["fenced_code_block"]
+    fenced.get_hl_settings()
+    ext = getattr(fenced, "highlight_ext", None)
+    return ext if hasattr(ext, "pygments_code_block") else None
+
+
 # -- rendering -------------------------------------------------------------------
 
 
@@ -189,13 +199,25 @@ class _Renderer:
                     extension_configs=config["mdx_configs"],
                 )
             else:
-                self._inner = Markdown(extensions=FALLBACK_EXTENSIONS)
+                outer = _highlight(self.md)
+                configs = {"pymdownx.highlight": outer.getConfigs()} if outer else {}
+                self._inner = Markdown(
+                    extensions=FALLBACK_EXTENSIONS, extension_configs=configs
+                )
         return self._inner
 
     def markdown(self, text: str) -> str:
-        inner = self.inner
+        # Carry the code block counter across, so line anchors
+        # (__codelineno-N-M) stay unique on the page.
+        inner, outer_hl = self.inner, _highlight(self.md)
         inner.reset()
-        return inner.convert(text)
+        inner_hl = _highlight(inner)
+        if outer_hl and inner_hl:
+            inner_hl.pygments_code_block = outer_hl.pygments_code_block
+        html = inner.convert(text)
+        if outer_hl and inner_hl:
+            outer_hl.pygments_code_block = inner_hl.pygments_code_block
+        return html
 
     def inline(self, text: str) -> str:
         html = self.markdown(text).strip()

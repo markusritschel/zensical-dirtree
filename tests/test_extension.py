@@ -17,16 +17,19 @@ BADGES = {
 }
 
 
-def make_md(*, toc: bool = False, superfences: bool = True, **config) -> Markdown:
+def make_md(
+    *, toc: bool = False, superfences: bool = True, anchors: bool = False, **config
+) -> Markdown:
     config.setdefault("badges", BADGES)
     extensions = ["pymdownx.highlight", "zensical_dirtree"]
     if superfences:
         extensions.insert(0, "pymdownx.superfences")
     if toc:
         extensions.append("toc")
-    return Markdown(
-        extensions=extensions, extension_configs={"zensical_dirtree": config}
-    )
+    configs = {"zensical_dirtree": config}
+    if anchors:
+        configs["pymdownx.highlight"] = {"anchor_linenums": True}
+    return Markdown(extensions=extensions, extension_configs=configs)
 
 
 def render(source: str, **options) -> str:
@@ -286,6 +289,24 @@ def test_body_code_renders_like_page_code():
         )
     )
     assert page.strip() in html
+
+
+def test_code_line_ids_do_not_collide_with_page():
+    body_tree = tree(
+        """
+        nodes:
+          - label: a
+            body: |
+              ```python
+              y = 2
+              ```
+        """
+    )
+    source = "```python\nx = 1\n```\n\n" + body_tree + "\n```python\nz = 3\n```\n"
+    html = render(source, anchors=True)
+    ids = re.findall(r'id="(__codelineno-[^"]+)"', html)
+    assert len(ids) == 3, html
+    assert len(set(ids)) == 3, ids
 
 
 def test_body_file(project):
