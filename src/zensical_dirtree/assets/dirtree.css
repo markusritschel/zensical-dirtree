@@ -529,10 +529,12 @@
   border-radius: inherit;
 }
 
+/* ~60% of full text strength: the theme's text colour is itself only ~87%
+   opaque, so 69% of it lands at about 0.6 (the --light shade is ~0.54). */
 .dirtree__entry-summary {
   min-width: 0;
-  color: var(--md-default-fg-color--light);
-  font-size: 0.65rem;
+  color: color-mix(in srgb, var(--md-default-fg-color) 69%, transparent);
+  font-size: 0.6rem;
 }
 
 /* Links inside a summary stay clickable above the stretched row link. */
