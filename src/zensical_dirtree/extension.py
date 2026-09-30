@@ -403,9 +403,11 @@ class _Renderer:
             group = (
                 f'<ul role="group">{"".join(self.item(c) for c in node.children)}</ul>'
             )
+        # Depth drives the row's own indent, so highlights span full width.
+        depth = len(node.ancestors)
         return (
             f'<li role="treeitem"{expanded} data-node="{node.id}">'
-            f'<span class="dirtree__row">{arrow}'
+            f'<span class="dirtree__row" style="--dirtree-depth: {depth}">{arrow}'
             f'<a class="dirtree__link" href="#{PREFIX}{node.id}">'
             f"{_icon(self.icon_for(node))}"
             f'<span class="dirtree__label">{escape(node.label)}</span></a></span>'

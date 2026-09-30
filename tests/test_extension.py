@@ -108,6 +108,19 @@ def test_nesting_and_folders():
     assert re.search(r'<li role="treeitem" data-node="src-pkg-main-py"', html)
 
 
+def test_rows_carry_their_depth():
+    # Indentation lives inside the row, so the selection highlight spans the
+    # full width of the tree.
+    html = render(tree("nodes:\n  - label: a/\n    children:\n      - label: b.py\n"))
+    assert re.search(
+        r'data-node="a">\s*<span class="dirtree__row" style="--dirtree-depth: 0"', html
+    )
+    assert re.search(
+        r'data-node="a-b-py">\s*<span class="dirtree__row" style="--dirtree-depth: 1"',
+        html,
+    )
+
+
 def test_folder_panel_lists_contents():
     html = render(
         tree(
