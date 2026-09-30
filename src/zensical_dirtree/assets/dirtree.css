@@ -250,8 +250,20 @@
   color: var(--md-accent-fg-color);
 }
 
+/* Title left, badges right-aligned on the same line; badges wrap below
+   the title only when there is no room beside it. */
+.dirtree__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem 0.8rem;
+}
+
 .md-typeset .dirtree .dirtree__title {
   display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
   align-items: center;
   gap: 0.5rem;
   margin: 0;
@@ -272,11 +284,11 @@
   color: var(--md-default-fg-color--light);
 }
 
-.md-typeset .dirtree .dirtree__badges {
+.dirtree__badges {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
-  margin: 0.5rem 0;
+  margin-left: auto;
 }
 
 .dirtree__badge {

@@ -213,6 +213,13 @@ def test_named_badge():
     assert ">committed</span>" in html
 
 
+def test_badges_share_the_title_line():
+    html = render(tree("nodes:\n  - label: a\n    badges: [committed]\n"))
+    head = re.search(r'<div class="dirtree__head">(.*?)</div>', html, re.S)
+    assert head, html
+    assert re.search(r"dirtree__title.*dirtree__badges.*committed", head.group(1))
+
+
 def test_raw_colour_badge():
     html = render(tree("nodes:\n  - label: a\n    badges: [custom]\n"))
     assert 'style="--dirtree-badge: #123abc"' in html

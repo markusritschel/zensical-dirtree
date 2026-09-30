@@ -401,19 +401,17 @@ class _Renderer:
 
     def panel(self, node: Node, root: str | None) -> str:
         spec, pid = node.spec, f"{PREFIX}{node.id}"
+        badges = "".join(self.badge(str(b), node) for b in spec.get("badges", []))
         parts = [self.crumbs(node, root)]
         parts.append(
+            '<div class="dirtree__head">'
             f'<p class="dirtree__title" id="{pid}-title">'
             f"{_icon(self.icon_for(node))}<span>{escape(node.label)}</span></p>"
+            + (f'<span class="dirtree__badges">{badges}</span>' if badges else "")
+            + "</div>"
         )
         if "summary" in spec:
             parts.append(f'<p class="dirtree__summary">{self.summary(node)}</p>')
-        if spec.get("badges"):
-            parts.append(
-                '<p class="dirtree__badges">'
-                + "".join(self.badge(str(b), node) for b in spec["badges"])
-                + "</p>"
-            )
         if spec.get("fields"):
             rows = "".join(
                 f'<div class="dirtree__field"><dt>{escape(str(f["label"]))}</dt>'
