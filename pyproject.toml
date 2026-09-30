@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "zensical-dirtree"
+version = "0.1.0"
+description = "Interactive directory-tree explorer for Zensical documentation sites"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Markus Ritschel", email = "git@markusritschel.de" }]
+keywords = ["zensical", "markdown", "markdown-extension", "documentation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Topic :: Documentation",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+dependencies = [
+    "markdown>=3.4",
+    "pymdown-extensions>=10.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+zensical-dirtree = "zensical_dirtree.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6", "zensical>=0.0.60"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zensical_dirtree"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
