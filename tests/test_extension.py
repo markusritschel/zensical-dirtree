@@ -153,6 +153,18 @@ def test_breadcrumb_without_root():
     assert re.sub(r"<[^>]+>", "", crumbs).strip() == "a.py"
 
 
+def test_toggle_all_is_an_icon_button_with_label():
+    html = render(tree("nodes:\n  - label: src/\n"))
+    button = re.search(r"<button[^>]*data-dirtree-toggle-all[^>]*>(.*?)</button>", html)
+    assert button, html
+    assert 'aria-label="Expand all"' in button.group(0)
+    assert 'title="Expand all"' in button.group(0)
+    # Icons only; the label lives in aria-label and the tooltip.
+    assert re.sub(r"<[^>]+>", "", button.group(1)).strip() == ""
+    assert "dirtree__toggle-icon--expand" in button.group(1)
+    assert "dirtree__toggle-icon--collapse" in button.group(1)
+
+
 # -- ids ---------------------------------------------------------------------
 
 

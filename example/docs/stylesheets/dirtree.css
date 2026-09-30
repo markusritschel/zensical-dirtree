@@ -82,22 +82,40 @@
 }
 
 .dirtree__toggle-all {
+  display: inline-flex;
   flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
   margin-left: auto;
-  white-space: nowrap;
-  padding: 0.1rem 0.3rem;
+  padding: 0;
   border: 0;
   border-radius: 0.2rem;
   background: none;
-  color: var(--md-typeset-a-color);
-  font: inherit;
-  font-size: 0.6rem;
+  color: var(--md-default-fg-color--light);
   cursor: pointer;
+}
+
+.dirtree__toggle-all[hidden] {
+  display: none;
 }
 
 .dirtree__toggle-all:hover,
 .dirtree__toggle-all:focus-visible {
   background: var(--dirtree-border);
+  color: var(--md-accent-fg-color);
+}
+
+.dirtree__toggle-icon {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+/* Show the icon for the action a click will perform. */
+.dirtree__toggle-all:not([data-action="collapse"]) .dirtree__toggle-icon--collapse,
+.dirtree__toggle-all[data-action="collapse"] .dirtree__toggle-icon--expand {
+  display: none;
 }
 
 .md-typeset .dirtree .dirtree__tree ul {

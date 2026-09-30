@@ -89,6 +89,16 @@ ICONS = {
     + '<circle cx="12" cy="14.5" r="2"/><path d="M12 11v1.5M12 16.5V18"/>',
     "md": _FILE + '<path d="M8 17v-4l2 2 2-2v4M15 13v4m-1.5-1.5L15 17l1.5-1.5"/>',
 }
+#: Expand all / collapse all; the stylesheet shows the one for the next action.
+TOGGLE_ICONS = "".join(
+    f'<svg class="dirtree__toggle-icon dirtree__toggle-icon--{name}" '
+    'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+    f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{paths}</svg>'
+    for name, paths in (
+        ("expand", '<path d="m7 15 5 5 5-5M7 9l5-5 5 5"/>'),
+        ("collapse", '<path d="m7 20 5-5 5 5M7 4l5 5 5-5"/>'),
+    )
+)
 SUFFIX_ICONS = {
     **dict.fromkeys(
         "py js mjs ts tsx jsx rs go c h cpp java rb php sh bash zsh fish lua r jl"
@@ -367,7 +377,8 @@ class _Renderer:
             '<div class="dirtree__side"><div class="dirtree__bar">'
             f"{root_html}"
             '<button type="button" class="dirtree__toggle-all" '
-            "data-dirtree-toggle-all hidden>Expand all</button></div>"
+            'data-dirtree-toggle-all aria-label="Expand all" title="Expand all" '
+            f"hidden>{TOGGLE_ICONS}</button></div>"
             f'<nav class="dirtree__tree" role="tree" aria-label="{label}">'
             f'<ul role="group">{"".join(self.item(n) for n in nodes)}</ul>'
             "</nav></div>"

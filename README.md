@@ -166,7 +166,9 @@ badges or icons, unsafe badge colours, duplicate ids and an unknown `selected`.
   visible nodes, <kbd>→</kbd> expands or enters a folder, <kbd>←</kbd>
   collapses or moves to the parent, <kbd>Home</kbd>/<kbd>End</kbd> jump,
   <kbd>Enter</kbd>/<kbd>Space</kbd> select and toggle. The tree is a single tab stop.
-- "Expand all" / "Collapse all" above the tree.
+- An icon button above the tree expands or collapses all folders; its label
+  ("Expand all" / "Collapse all") shows as a tooltip and is read by screen
+  readers. Enable Zensical's `content.tooltips` feature for styled tooltips.
 - Selections are announced through a polite live region.
 - Below 700px wide, the tree stacks above the panel.
 - Without JavaScript: a nested list of links, followed by every node's

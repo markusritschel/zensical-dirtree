@@ -51,9 +51,11 @@
     function syncToggleAll() {
       if (!toggleAll) return;
       toggleAll.hidden = folders.length === 0;
-      toggleAll.textContent = folders.some((f) => !isOpen(f))
-        ? "Expand all"
-        : "Collapse all";
+      const action = folders.some((f) => !isOpen(f)) ? "expand" : "collapse";
+      const label = action === "expand" ? "Expand all" : "Collapse all";
+      toggleAll.dataset.action = action; // picks the icon
+      toggleAll.setAttribute("aria-label", label);
+      toggleAll.title = label; // hover tooltip
     }
 
     function setOpen(li, open) {
