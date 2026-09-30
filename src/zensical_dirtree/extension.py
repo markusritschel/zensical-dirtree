@@ -16,6 +16,7 @@ exception raised by a formatter and silently emits a plain code block instead.
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 from html import escape
@@ -27,6 +28,8 @@ from markdown import Markdown
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 from pymdownx.superfences import SuperFencesException
+
+log = logging.getLogger("zensical_dirtree")
 
 FENCE = "dirtree"
 PREFIX = "dirtree-"
@@ -166,6 +169,30 @@ def _highlight(md: Markdown) -> Any | None:
     fenced.get_hl_settings()
     ext = getattr(fenced, "highlight_ext", None)
     return ext if hasattr(ext, "pygments_code_block") else None
+
+
+_watch_warned = False
+
+
+def _warn_if_unwatched(config: dict[str, Any], base: Path) -> None:
+    """Zensical caches pages by their own source, so without ``watch`` an edited
+    body file is ignored by ``serve`` and even by ``build``."""
+    global _watch_warned  # noqa: PLW0603
+    if _watch_warned:
+        return
+    root = Path(config["root_dir"]).resolve()
+    for entry in config.get("watch") or []:
+        watched = (root / entry).resolve()
+        if base == watched or base.is_relative_to(watched):
+            return
+    _watch_warned = True
+    log.warning(
+        "zensical_dirtree: base_path %s is not listed under [project] watch, so "
+        "edits to body files are not picked up until the embedding page changes. "
+        'Add: watch = ["%s"]',
+        base,
+        base.relative_to(root) if base.is_relative_to(root) else base,
+    )
 
 
 # -- rendering -------------------------------------------------------------------
@@ -465,6 +492,8 @@ class _Renderer:
         base = (root / self.ext.getConfig("base_path")).resolve()
         if not base.is_relative_to(root):
             raise self.error(f"base_path {base} is outside the project root {root}")
+        if self.context:
+            _warn_if_unwatched(self.context.config, base)
         target = (base / node.spec["body_file"]).resolve()
         if not target.is_relative_to(root):
             raise self.error(
