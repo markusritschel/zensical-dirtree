@@ -139,9 +139,18 @@ def test_breadcrumb_links_ancestors():
         )
     )
     panel = html[html.index('id="dirtree-src-a-py"') :]
-    crumbs = panel[: panel.index("dirtree__title")]
-    assert "proj/" in crumbs
+    crumbs = re.search(r'<p class="dirtree__crumbs">(.*?)</p>', panel).group(1)
     assert 'href="#dirtree-src"' in crumbs
+    # Reads as a plain path, current node included, no doubled slashes.
+    assert re.sub(r"<[^>]+>", "", crumbs).strip() == "proj / src / a.py"
+    assert '<span class="dirtree__crumb-current">a.py</span>' in crumbs
+
+
+def test_breadcrumb_without_root():
+    html = render(tree("nodes:\n  - label: a.py\n"))
+    panel = html[html.index('id="dirtree-a-py"') :]
+    crumbs = re.search(r'<p class="dirtree__crumbs">(.*?)</p>', panel).group(1)
+    assert re.sub(r"<[^>]+>", "", crumbs).strip() == "a.py"
 
 
 # -- ids ---------------------------------------------------------------------

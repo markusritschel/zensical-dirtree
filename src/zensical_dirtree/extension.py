@@ -448,13 +448,17 @@ class _Renderer:
         )
 
     def crumbs(self, node: Node, root: str | None) -> str:
-        items = [escape(root)] if root else []
+        """The node's path, ``root / src / main.py``; ancestors link to panels."""
+        items = [escape(root.rstrip("/"))] if root else []
         items += [
-            f'<a href="#{PREFIX}{a.id}">{escape(a.label)}</a>' for a in node.ancestors
+            f'<a href="#{PREFIX}{a.id}">{escape(a.label.rstrip("/"))}</a>'
+            for a in node.ancestors
         ]
-        if not items:
-            return ""
-        sep = '<span class="dirtree__sep" aria-hidden="true">›</span>'
+        items.append(
+            f'<span class="dirtree__crumb-current">{escape(node.label.rstrip("/"))}'
+            "</span>"
+        )
+        sep = '<span class="dirtree__sep"> / </span>'
         return f'<p class="dirtree__crumbs">{sep.join(items)}</p>'
 
     def summary(self, node: Node) -> str:
