@@ -444,16 +444,21 @@ class _Renderer:
             )
         if node.children:
             entries = "".join(
-                f'<li><a href="#{PREFIX}{c.id}">{_icon(self.icon_for(c))}'
-                f"{escape(c.label)}</a>"
-                + (f" — {self.summary(c)}" if "summary" in c.spec else "")
+                '<li class="dirtree__entry">'
+                f'<a class="dirtree__entry-name" href="#{PREFIX}{c.id}">'
+                f"{_icon(self.icon_for(c))}{escape(c.label)}</a>"
+                + (
+                    f'<span class="dirtree__entry-summary">{self.summary(c)}</span>'
+                    if "summary" in c.spec
+                    else ""
+                )
                 + "</li>"
                 for c in node.children
             )
             parts.append(
                 '<div class="dirtree__contents">'
                 '<p class="dirtree__contents-title">Contents</p>'
-                f"<ul>{entries}</ul></div>"
+                f'<ul class="dirtree__entries">{entries}</ul></div>'
             )
         return (
             f'<section class="dirtree__panel" id="{pid}" data-panel="{node.id}" '

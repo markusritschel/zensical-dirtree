@@ -135,8 +135,23 @@ def test_folder_panel_lists_contents():
     )
     panel = html[html.index('id="dirtree-src"') :]
     assert "Contents" in panel
-    assert 'href="#dirtree-src-a-py"' in panel
-    assert "The A module" in panel
+    entry = re.search(r'<li class="dirtree__entry">(.*?)</li>', panel, re.S)
+    assert entry, panel
+    # Icon, name (the link) and summary side by side; no "—" separator.
+    assert re.search(
+        r'<a class="dirtree__entry-name" href="#dirtree-src-a-py">'
+        r'<svg class="dirtree__icon dirtree__icon--code".*?</svg>a\.py</a>'
+        r'<span class="dirtree__entry-summary">The A module</span>',
+        entry.group(1),
+        re.S,
+    ), entry.group(1)
+    assert "—" not in panel
+
+
+def test_contents_entry_without_summary():
+    html = render(tree("nodes:\n  - label: src/\n    children:\n      - label: a\n"))
+    entry = re.search(r'<li class="dirtree__entry">(.*?)</li>', html, re.S)
+    assert "dirtree__entry-summary" not in entry.group(1)
 
 
 def test_breadcrumb_links_ancestors():
