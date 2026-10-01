@@ -630,13 +630,12 @@ class _RegisterFence(Preprocessor):
 def _inline_assets() -> str:
     """The stylesheet and script, so sites need no extra_css/extra_javascript.
 
-    The CSS sits in a cascade layer: unlayered rules in the site's own
-    stylesheets beat it whatever their order, so it stays easy to override.
+    Not in a cascade layer: that would lose to the theme's list styles too.
     """
     assets = Path(__file__).parent / "assets"
     css = (assets / "dirtree.css").read_text(encoding="utf-8")
     js = (assets / "dirtree.js").read_text(encoding="utf-8")
-    return f"<style>@layer dirtree {{\n{css}\n}}</style>\n<script>{js}</script>\n"
+    return f"<style>{css}</style>\n<script>{js}</script>\n"
 
 
 class DirtreeExtension(Extension):

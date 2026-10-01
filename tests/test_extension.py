@@ -653,11 +653,24 @@ def test_assets_inlined_once_per_page():
     assert asset_path("dirtree.js").read_text() in html
 
 
-def test_inlined_css_sits_in_a_cascade_layer():
-    # Layered styles lose to the site's own extra_css, whatever the order.
+def test_inlined_css_is_not_layered():
+    # A cascade layer would lose to the theme's own list margins too.
     html = render(tree("nodes:\n  - label: a\n"), inline_assets=True)
     css = asset_path("dirtree.css").read_text()
-    assert f"<style>@layer dirtree {{\n{css}\n}}</style>" in html
+    assert f"<style>{css}</style>" in html
+
+
+def test_custom_property_defaults_yield_to_site_css():
+    # The inlined CSS comes after extra_css, so the documented overrides
+    # (`.dirtree`, `[data-md-color-scheme="slate"] .dirtree`) must outrank it.
+    css = asset_path("dirtree.css").read_text()
+    blocks = re.findall(r"^([^\s/@}][^{]*)\{([^}]*)\}", css, re.MULTILINE)
+    documented = r"--dirtree-(icon|tree)-[\w-]+:"  # README "Icon colours"
+    defining = [sel.strip() for sel, body in blocks if re.search(documented, body)]
+    assert defining == [
+        ":where(.dirtree)",
+        ':where([data-md-color-scheme="slate"]) .dirtree',
+    ]
 
 
 def test_assets_inlined_again_on_the_next_page():

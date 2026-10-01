@@ -48,9 +48,12 @@ Things to know:
   already list them all; otherwise copy the complete default list from
   [`example/zensical.toml`](example/zensical.toml).
 - **No stylesheet or script to set up.** The extension inlines both before the
-  first tree on each page (about 6 KB gzipped). The CSS sits in the `dirtree`
-  cascade layer, so any rule in a stylesheet of your own (`extra_css`)
-  overrides it. If your Content Security Policy forbids inline scripts, or you
+  first tree on each page (about 6 KB gzipped). The `--dirtree-*` custom
+  properties (see [Icon colours](#icon-colours)) can be overridden from a
+  stylesheet of your own (`extra_css`) as before. Since the inlined CSS comes
+  after your stylesheets, any other rule needs a more specific selector than
+  the one it overrides, e.g. prefixed with `.md-typeset`. If your Content
+  Security Policy forbids inline scripts, or you
   want to replace the script, set `inline_assets = false`, run
   `zensical-dirtree install --docs-dir docs` (again after each upgrade) and
   list the two copied files in `extra_css` and `extra_javascript`.

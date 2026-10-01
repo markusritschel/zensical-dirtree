@@ -52,11 +52,13 @@ otherwise leave a raw code block and a green build.
 
 The assets live in `src/zensical_dirtree/assets/`. By default
 `DirtreeExtension.format` prepends them inline to a page's first tree
-(`assets_inlined` is reset per page like `used_ids`), the CSS wrapped in
-`@layer dirtree` so unlayered site CSS overrides it. Zensical re-runs inline
-scripts on instant navigation. With `inline_assets = false`, `cli.py` copies
-them into a docs dir instead. `dirtree.js` initialises each `[data-dirtree]` via `document$`, keeps
-per-widget state in a `WeakMap` (idempotent init), and registers one global
+(`assets_inlined` is reset per page like `used_ids`). Zensical re-runs inline
+scripts on instant navigation. The CSS must not go into a cascade layer: that
+would lose to the theme's `.md-typeset ul/li` rules too. Since it lands after
+`extra_css`, the `--dirtree-*` defaults sit in `:where()` so the documented
+overrides still win. With `inline_assets = false`, `cli.py` copies the assets
+into a docs dir instead. `dirtree.js` initialises each `[data-dirtree]` via
+`document$`, keeps per-widget state in a `WeakMap` (idempotent init), and registers one global
 `hashchange` listener, guarded by `window.__dirtreeLoaded`.
 
 `example/snippets/trees/dirtree.schema.json` is a **copy** made by the CLI.
