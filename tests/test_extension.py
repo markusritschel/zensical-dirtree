@@ -275,16 +275,12 @@ def test_ids_reset_between_pages():
     assert 'id="dirtree-a-txt"' in md.convert(tree("nodes:\n  - label: a.txt\n"))
 
 
-def test_selected_defaults_to_first_node():
+def test_trees_always_open_on_their_first_node():
+    # The script selects the first node; there is no per-tree override.
     html = render(tree("nodes:\n  - label: a\n  - label: b\n"))
-    assert 'data-selected="a"' in html
-
-
-def test_selected_explicit_and_unknown():
-    html = render(tree("selected: b\nnodes:\n  - label: a\n  - label: b\n"))
-    assert 'data-selected="b"' in html
-    with pytest.raises(DirtreeError, match="selected"):
-        render(tree("selected: nope\nnodes:\n  - label: a\n"))
+    assert "data-selected" not in html
+    with pytest.raises(DirtreeError, match="unknown key 'selected'"):
+        render(tree("selected: b\nnodes:\n  - label: a\n  - label: b\n"))
 
 
 # -- badges and fields -------------------------------------------------------
@@ -542,7 +538,6 @@ def test_src_loads_whole_tree_from_file(project, tree_file):
     src = tree_file(
         """
         root: proj/
-        selected: src-main-py
         nodes:
           - label: src/
             children:
@@ -553,7 +548,6 @@ def test_src_loads_whole_tree_from_file(project, tree_file):
     )
     html = render(tree(f"src: {src}\n"), base_path="snippets")
     assert 'aria-label="proj/"' in html
-    assert 'data-selected="src-main-py"' in html
     assert "Entry point" in html
     # body_file inside a tree file still resolves against base_path.
     assert "From <em>body file</em>." in html

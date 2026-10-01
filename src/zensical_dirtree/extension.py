@@ -43,7 +43,7 @@ ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 #: nothing that could leave the style attribute.
 COLOUR_RE = re.compile(r"^[#\w\s(),.%/-]+$")
 
-TOP_KEYS = {"root", "nodes", "selected", "contents_limit"}
+TOP_KEYS = {"root", "nodes", "contents_limit"}
 CONTENTS_LIMIT = 10  # "Contents" entries shown before "Show N more"
 NODE_KEYS = {
     "label",
@@ -269,7 +269,7 @@ class _Renderer:
 
     # -- parsing
 
-    def parse(self, source: str) -> tuple[str | None, list[Node], str]:
+    def parse(self, source: str) -> tuple[str | None, list[Node]]:
         try:
             data = yaml.safe_load(source)
         except yaml.YAMLError as error:
@@ -294,10 +294,7 @@ class _Renderer:
         self.contents_limit = limit
 
         root = data.get("root")
-        selected = data.get("selected", nodes[0].id)
-        if selected not in {n.id for top in nodes for n in top.walk()}:
-            raise self.error(f"selected: unknown node id '{selected}'")
-        return (str(root) if root is not None else None), nodes, str(selected)
+        return (str(root) if root is not None else None), nodes
 
     def build(self, spec: Any, parent: Node | None) -> Node:
         prefix = f"{parent.path}/" if parent else ""
@@ -375,7 +372,7 @@ class _Renderer:
         return SUFFIX_ICONS.get(name.rsplit(".", 1)[1], "file")
 
     def render(self, source: str) -> str:
-        root, nodes, selected = self.parse(source)
+        root, nodes = self.parse(source)
         label = escape(root or "Directory tree", quote=True)
         root_html = (
             f'<span class="dirtree__root">{_icon("folder")}{escape(root)}</span>'
@@ -384,7 +381,7 @@ class _Renderer:
         )
         every = [n for top in nodes for n in top.walk()]
         return (
-            f'<div class="dirtree" data-dirtree data-selected="{escape(selected)}">'
+            '<div class="dirtree" data-dirtree>'
             '<div class="dirtree__side"><div class="dirtree__bar">'
             f"{root_html}"
             '<button type="button" class="dirtree__toggle-all" '

@@ -6,7 +6,6 @@ disabled it reads as a list followed by every description.
 
 ````dirtree
 root: your-project/
-selected: config-toml
 nodes:
   - label: zensical.toml
     id: config-toml

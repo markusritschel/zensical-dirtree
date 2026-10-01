@@ -99,7 +99,6 @@ triple-backtick code blocks. The content is YAML.
 `````markdown
 ````dirtree
 root: your-project/
-selected: config-toml
 nodes:
   - label: zensical.toml
     id: config-toml
@@ -130,7 +129,6 @@ nodes:
 | --- | --- | --- |
 | `nodes` | yes | Non-empty list of nodes. |
 | `root` | no | Label shown above the tree and at the start of each breadcrumb. |
-| `selected` | no | Id of the node selected on load. Default: the first node. |
 | `contents_limit` | no | Entries a folder's "Contents" list shows before a "Show N more" button. Default: 10. Without JavaScript the full list is shown. |
 
 ### Nodes
@@ -171,7 +169,7 @@ Mistakes fail the build with the page, node and cause, for example
 `dirtree: index.md: node 'src/main.py': body_file not found: /…/snippets/main-py.md`.
 This covers invalid YAML, unknown keys, `body` together with `body_file`, a
 missing body file, a `body_file` or `base_path` outside the project root, unknown
-badges or icons, unsafe badge colours, duplicate ids and an unknown `selected`.
+badges or icons, unsafe badge colours and duplicate ids.
 For a tree loaded from a file, the message names the file too:
 `dirtree: index.md: trees/project.yaml: node 'src': unknown icon 'rocket'`.
 
@@ -186,13 +184,13 @@ src: trees/project.yaml
 ```
 ````
 
-The file has exactly the format of a fence's content (`root`, `selected`,
-`nodes`). Its path resolves against `base_path`, like `body_file`, so with
+The file has exactly the format of a fence's content (`root`,
+`contents_limit`, `nodes`). Its path resolves against `base_path`, like `body_file`, so with
 `base_path = "snippets"` the file above is `snippets/trees/project.yaml`.
 `body_file` paths inside it resolve against `base_path` as well. Keep
 `watch = ["snippets"]` so edits to tree files rebuild the pages using them.
 
-`src` stands alone: `root`, `selected` and `nodes` belong in the file, and a
+`src` stands alone: the other top-level keys belong in the file, and a
 tree file cannot load another one.
 
 ### Editor validation

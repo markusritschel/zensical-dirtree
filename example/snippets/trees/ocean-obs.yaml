@@ -8,7 +8,6 @@
 #
 # The schema line above gives editors completion and live checks.
 root: ocean-obs/
-selected: data-raw
 nodes:
   - label: pyproject.toml
     badges: [committed]

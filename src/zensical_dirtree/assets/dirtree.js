@@ -167,7 +167,7 @@
     controllers.set(root, controller);
     syncToggleAll();
     if (!fromHash(location.hash)) {
-      select(byId(root.dataset.selected) || items[0], { announce: false, hash: false });
+      select(items[0], { announce: false, hash: false }); // trees open on their first node
     }
   }
 
