@@ -1,18 +1,24 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
 name = "zensical-dirtree"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Interactive directory-tree explorer for Zensical documentation sites"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Markus Ritschel", email = "git@markusritschel.de" }]
 keywords = ["zensical", "markdown", "markdown-extension", "documentation"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Documentation",
     "Topic :: Text Processing :: Markup :: Markdown",
 ]
@@ -21,6 +27,12 @@ dependencies = [
     "pymdown-extensions>=10.0",
     "pyyaml>=6.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/markusritschel/zensical-dirtree"
+Repository = "https://github.com/markusritschel/zensical-dirtree"
+Issues = "https://github.com/markusritschel/zensical-dirtree/issues"
+Changelog = "https://github.com/markusritschel/zensical-dirtree/blob/main/CHANGELOG.md"
 
 [project.scripts]
 zensical-dirtree = "zensical_dirtree.cli:main"
@@ -32,6 +44,9 @@ dev = [
     "ruff>=0.6",
     "zensical>=0.0.60",
 ]
+
+[tool.hatch.version]
+path = "src/zensical_dirtree/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/zensical_dirtree"]
