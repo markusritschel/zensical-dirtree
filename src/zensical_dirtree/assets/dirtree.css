@@ -11,6 +11,17 @@
     transparent
   );
   --dirtree-tint: color-mix(in srgb, var(--md-accent-fg-color) 8%, transparent);
+  /* Tree pane shading, set apart from the panel; hover sits on top of it. */
+  --dirtree-tree-bg: color-mix(
+    in srgb,
+    var(--md-default-fg-color) 2%,
+    transparent
+  );
+  --dirtree-tree-hover: color-mix(
+    in srgb,
+    var(--md-default-fg-color) 4.5%,
+    transparent
+  );
   --dirtree-green: #1a7f37;
   --dirtree-orange: #c2410c;
   --dirtree-amber: #9a6700;
@@ -56,6 +67,7 @@
 .dirtree__side {
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--dirtree-border);
+  background: var(--dirtree-tree-bg);
 }
 
 .dirtree--js .dirtree__side {
@@ -109,7 +121,7 @@
 
 .dirtree__toggle-all:hover,
 .dirtree__toggle-all:focus-visible {
-  background: var(--dirtree-hover);
+  background: var(--dirtree-tree-hover);
   color: var(--md-accent-fg-color);
 }
 
@@ -150,7 +162,7 @@
 }
 
 .dirtree--js .dirtree__row:hover {
-  background: var(--dirtree-hover);
+  background: var(--dirtree-tree-hover);
 }
 
 /* Selected: an accent bar on the left edge over a faint accent tint. */

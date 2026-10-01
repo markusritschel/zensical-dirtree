@@ -88,6 +88,8 @@ properties in a stylesheet of your own to match your palette:
 ```
 
 For dark mode, set them under `[data-md-color-scheme="slate"] .dirtree`.
+The tree pane's shading works the same way: `--dirtree-tree-bg` (and
+`--dirtree-tree-hover` for hovered rows); set it to `transparent` for no shading.
 
 ## Syntax
 
