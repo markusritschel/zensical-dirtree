@@ -13,9 +13,19 @@ disabled.
 ## Install
 
 ```bash
-uv add git+https://github.com/markusritschel/zensical-dirtree
-# or: pip install git+https://github.com/markusritschel/zensical-dirtree
+uv add zensical-dirtree          # or: pip install zensical-dirtree
 ```
+
+Install it into the same environment as Zensical. After upgrading, rebuild
+once with `zensical build --clean`: Zensical reuses cached pages otherwise,
+including the stylesheet and script inlined from the previous version.
+
+Tested with Zensical 0.0.67. Zensical is pre-1.0 and the extension uses parts
+of its rendering context, so check the [changelog][changelog] when upgrading
+either. The development version installs from GitHub:
+`uv add git+https://github.com/markusritschel/zensical-dirtree`.
+
+[changelog]: https://github.com/markusritschel/zensical-dirtree/blob/main/CHANGELOG.md
 
 ## Configure
 
@@ -46,10 +56,10 @@ Things to know:
   drops its whole built-in set (SuperFences, highlighting, admonitions, …).
   List them again next to `zensical_dirtree`. Sites created with `zensical new`
   already list them all; otherwise copy the complete default list from
-  [`example/zensical.toml`](example/zensical.toml).
+  [`example/zensical.toml`](https://github.com/markusritschel/zensical-dirtree/blob/main/example/zensical.toml).
 - **No stylesheet or script to set up.** The extension inlines both before the
   first tree on each page (about 6 KB gzipped). The `--dirtree-*` custom
-  properties (see [Icon colours](#icon-colours)) can be overridden from a
+  properties (see "Icon colours" below) can be overridden from a
   stylesheet of your own (`extra_css`) as before. Since the inlined CSS comes
   after your stylesheets, any other rule needs a more specific selector than
   the one it overrides, e.g. prefixed with `.md-typeset`. If your Content
@@ -240,7 +250,7 @@ after upgrading.
 
 - **Relative links inside a `body_file`** resolve relative to the page that
   embeds the tree, not to the body file.
-- **Live reload of body files needs `watch`** (see [Configure](#configure)).
+- **Live reload of body files needs `watch`** (see "Configure" above).
   Zensical fixes its watch list while reading the configuration, before
   extensions load, so the extension cannot add `base_path` itself.
 - **Outside Zensical** (plain Python-Markdown, e.g. in tests), bodies render
