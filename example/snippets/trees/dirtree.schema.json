@@ -10,9 +10,10 @@
       "type": "string",
       "description": "Label shown above the tree and at the start of each breadcrumb."
     },
-    "selected": {
-      "type": "string",
-      "description": "Id of the node selected on load. Default: the first node."
+    "contents_limit": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Entries a folder's Contents list shows before a 'Show N more' button. Default: 10."
     },
     "nodes": {
       "type": "array",

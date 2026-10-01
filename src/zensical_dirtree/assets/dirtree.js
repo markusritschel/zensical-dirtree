@@ -144,6 +144,17 @@
       select(li, { focus: true });
     });
 
+    // Long "Contents" lists end in "Show N more"; the markup has them all.
+    for (const button of root.querySelectorAll("[data-dirtree-show-more]")) {
+      button.hidden = false;
+      button.addEventListener("click", () => {
+        const extra = button.parentElement.querySelectorAll(".dirtree__entry--extra");
+        for (const li of extra) li.classList.remove("dirtree__entry--extra");
+        button.hidden = true;
+        extra[0].querySelector("a").focus(); // keep keyboard users in place
+      });
+    }
+
     const controller = {
       select: (id, scroll) => {
         const li = byId(id);
@@ -155,8 +166,13 @@
     };
     controllers.set(root, controller);
     syncToggleAll();
-    if (!fromHash(location.hash)) {
-      select(byId(root.dataset.selected) || items[0], { announce: false, hash: false });
+    // A deep link into this tree selects its node. Every other tree, including
+    // the rest of the page's trees when the link targets one, opens on its first node.
+    const target =
+      location.hash.startsWith(`#${PREFIX}`) &&
+      document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (!(target && root.contains(target) && fromHash(location.hash))) {
+      select(items[0], { announce: false, hash: false });
     }
   }
 

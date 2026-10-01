@@ -47,7 +47,7 @@ def test_schema_keys_match_the_validator():
 
 VALID = """
 root: proj/
-selected: src-main-py
+contents_limit: 5
 nodes:
   - label: config.toml
     id: config-toml
@@ -89,6 +89,8 @@ def test_valid_tree_passes_both():
         "nodes:\n  - label: a\n    fields: [oops]\n",
         "nodes:\n  - label: a\n    children: nope\n",
         "src: other.yaml\nnodes:\n  - label: a\n",  # src is fence-only
+        "contents_limit: 0\nnodes:\n  - label: a\n",
+        "selected: a\nnodes:\n  - label: a\n",  # trees open on the first node
     ],
 )
 def test_invalid_trees_fail_both(text):

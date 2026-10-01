@@ -78,3 +78,9 @@ Schema for editor validation.
   a Typer dependency).
 - The README install section leads with `uv add git+…` and gives the pip form
   as the alternative.
+- No `selected` key (2026-10-01): every tree opens on its first node, so the
+  initial view is predictable; deep links still select any node. The spec's
+  `selected` was implemented first and removed on request.
+- `contents_limit` (default 10, not in the spec): a folder's "Contents" list
+  shows that many entries, then a "Show N more" button (JS only; without JS
+  the full list shows). Long folders otherwise produced very tall panels.

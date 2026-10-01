@@ -6,7 +6,6 @@ disabled it reads as a list followed by every description.
 
 ````dirtree
 root: your-project/
-selected: config-toml
 nodes:
   - label: zensical.toml
     id: config-toml
@@ -86,17 +85,28 @@ scroll the explorer into view:
 ## A second tree on the same page
 
 Ids are unique across the page, so two trees can sit side by side in the
-document. The second one has no `root` label.
+document. The second one has no `root` label, and its `contents_limit: 3`
+shortens the "Contents" list of `raw/` to three entries and a "Show 2 more"
+button.
 
 ````dirtree
+contents_limit: 3
 nodes:
   - label: data/
     expanded: true
+    summary: Measurement data, raw and processed
+    body: |
+      Raw files are never edited: every correction happens in the processing
+      step, so `processed.nc` can always be rebuilt from `raw/`.
     children:
       - label: raw/
         summary: Untouched instrument output
         badges: [gitignored]
         children:
+          - label: 2026-09-26.csv
+          - label: 2026-09-27.csv
+          - label: 2026-09-28.csv
+          - label: 2026-09-29.csv
           - label: 2026-09-30.csv
             summary: One day of underway measurements
       - label: processed.nc

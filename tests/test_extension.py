@@ -154,6 +154,43 @@ def test_contents_entry_without_summary():
     assert "dirtree__entry-summary" not in entry.group(1)
 
 
+def folder(n: int, extra: str = "") -> str:
+    children = "".join(f"      - label: f{i}\n" for i in range(n))
+    return tree(f"{extra}nodes:\n  - label: d/\n    children:\n{children}")
+
+
+def test_contents_capped_at_ten_by_default():
+    html = render(folder(12))
+    assert html.count('<li class="dirtree__entry">') == 10
+    extras = re.findall(r'<li class="dirtree__entry dirtree__entry--extra">', html)
+    assert len(extras) == 2
+    # The last two children are the hidden ones, not some arbitrary pair.
+    assert re.search(r"dirtree__entry--extra\">.*?f10</a>.*?f11</a>", html, re.S)
+    assert re.search(
+        r'<button type="button" class="dirtree__show-more" '
+        r"data-dirtree-show-more hidden>Show 2 more</button></div>",
+        html,
+    ), html
+
+
+def test_contents_at_the_limit_are_not_capped():
+    html = render(folder(10))
+    assert "dirtree__entry--extra" not in html
+    assert "data-dirtree-show-more" not in html
+
+
+def test_contents_limit_option():
+    html = render(folder(3, "contents_limit: 2\n"))
+    assert html.count('<li class="dirtree__entry">') == 2
+    assert "Show 1 more" in html
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "'5'", "true", "2.5"])
+def test_contents_limit_must_be_a_positive_integer(value):
+    with pytest.raises(DirtreeError, match="contents_limit"):
+        render(folder(1, f"contents_limit: {value}\n"))
+
+
 def test_breadcrumb_links_ancestors():
     html = render(
         tree(
@@ -238,16 +275,12 @@ def test_ids_reset_between_pages():
     assert 'id="dirtree-a-txt"' in md.convert(tree("nodes:\n  - label: a.txt\n"))
 
 
-def test_selected_defaults_to_first_node():
+def test_trees_always_open_on_their_first_node():
+    # The script selects the first node; there is no per-tree override.
     html = render(tree("nodes:\n  - label: a\n  - label: b\n"))
-    assert 'data-selected="a"' in html
-
-
-def test_selected_explicit_and_unknown():
-    html = render(tree("selected: b\nnodes:\n  - label: a\n  - label: b\n"))
-    assert 'data-selected="b"' in html
-    with pytest.raises(DirtreeError, match="selected"):
-        render(tree("selected: nope\nnodes:\n  - label: a\n"))
+    assert "data-selected" not in html
+    with pytest.raises(DirtreeError, match="unknown key 'selected'"):
+        render(tree("selected: b\nnodes:\n  - label: a\n  - label: b\n"))
 
 
 # -- badges and fields -------------------------------------------------------
@@ -533,7 +566,6 @@ def test_src_loads_whole_tree_from_file(project, tree_file):
     src = tree_file(
         """
         root: proj/
-        selected: src-main-py
         nodes:
           - label: src/
             children:
@@ -544,7 +576,6 @@ def test_src_loads_whole_tree_from_file(project, tree_file):
     )
     html = render(tree(f"src: {src}\n"), base_path="snippets")
     assert 'aria-label="proj/"' in html
-    assert 'data-selected="src-main-py"' in html
     assert "Entry point" in html
     # body_file inside a tree file still resolves against base_path.
     assert "From <em>body file</em>." in html
