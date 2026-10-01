@@ -2,8 +2,9 @@
 
 Python-Markdown extension that renders a `dirtree` fenced block (YAML) into a
 static tree + detail-panel widget for Zensical sites, plus a vanilla-JS/CSS
-asset pair that makes it interactive. The spec is in `SPEC.md`; findings and
-deviations from building it are in `implementation-notes.md`.
+asset pair that makes it interactive. User-facing behaviour is specified by
+`README.md`; the goals, the Zensical behaviour the code relies on and the
+design decisions are in `DESIGN.md` (re-check it when upgrading Zensical).
 
 ```bash
 uv sync
