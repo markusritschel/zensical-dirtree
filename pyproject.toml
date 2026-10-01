@@ -48,6 +48,12 @@ dev = [
 [tool.hatch.version]
 path = "src/zensical_dirtree/__init__.py"
 
+[tool.hatch.build.targets.sdist]
+# Code, tests and the example they build; README, LICENSE and pyproject.toml
+# are always included. Maintainer files (AGENTS.md, DESIGN.md, ...) stay in
+# the repository.
+only-include = ["src", "tests", "example", "CHANGELOG.md"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/zensical_dirtree"]
 
