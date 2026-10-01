@@ -283,6 +283,34 @@ def tree_row(html: str, node: str) -> str:
     ).group(1)
 
 
+def tree_link(html: str, node: str) -> str:
+    return re.search(
+        rf'data-node="{node}">.*?(<a class="dirtree__link"[^>]*>)', html, re.S
+    ).group(1)
+
+
+def test_summary_is_tree_row_tooltip_as_plain_text():
+    html = render(
+        tree(
+            """
+            nodes:
+              - label: src/
+                children:
+                  - label: a.py
+                    summary: 'Main **config** & `"x" <y>`'
+            """
+        )
+    )
+    assert 'title="Main config &amp; &quot;x&quot; &lt;y&gt;"' in tree_link(
+        html, "src-a-py"
+    )
+
+
+def test_no_summary_no_tree_row_tooltip():
+    html = render(tree("nodes:\n  - label: a.py\n"))
+    assert "title=" not in tree_link(html, "a-py")
+
+
 def test_indicator_badge_shows_dot_in_tree_row():
     html = render(
         tree("nodes:\n  - label: a.py\n    badges: [committed]\n"),

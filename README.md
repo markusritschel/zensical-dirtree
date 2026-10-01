@@ -138,7 +138,7 @@ nodes:
 | --- | --- | --- |
 | `label` | str | **Required.** Display name. A trailing `/` or a `children` key makes it a folder. |
 | `id` | str | Slug for deep links (`[A-Za-z0-9_-]`). Default: the slugified label path, e.g. `src/main.py` → `src-main-py`. Must be unique on the page. |
-| `summary` | str | One line under the title, also shown in the parent's "Contents" list. Inline Markdown. |
+| `summary` | str | One line under the title, also shown in the parent's "Contents" list and as a plain-text tooltip on the tree row. Inline Markdown. |
 | `body` | str | Markdown. Mutually exclusive with `body_file`. |
 | `body_file` | str | Markdown file, relative to `base_path`. |
 | `badges` | list[str] | Keys from the badge configuration. |

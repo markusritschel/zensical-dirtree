@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass, field
-from html import escape
+from html import escape, unescape
 from pathlib import Path
 from typing import Any
 
@@ -409,10 +409,15 @@ class _Renderer:
             )
         # Depth drives the row's own indent, so highlights span full width.
         depth = len(node.ancestors)
+        # The summary as a hover tooltip; attributes take plain text only.
+        tip = ""
+        if "summary" in node.spec:
+            text = unescape(re.sub(r"<[^>]*>", "", self.summary(node)))
+            tip = f' title="{escape(text, quote=True)}"'
         return (
             f'<li role="treeitem"{expanded} data-node="{node.id}">'
             f'<span class="dirtree__row" style="--dirtree-depth: {depth}">{arrow}'
-            f'<a class="dirtree__link" href="#{PREFIX}{node.id}">'
+            f'<a class="dirtree__link" href="#{PREFIX}{node.id}"{tip}>'
             f"{_icon(self.icon_for(node))}"
             f'<span class="dirtree__label">{escape(node.label)}</span></a>'
             f"{self.dot(node)}</span>{group}</li>"
