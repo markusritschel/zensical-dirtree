@@ -159,6 +159,11 @@ Ids are unique across the whole page. When two nodes would get the same default
 id, including across two trees on one page, the later one gets a `-2`, `-3`, …
 suffix. Two explicit ids that clash are a build error.
 
+Those suffixes follow the order of trees on the page, so they shift when a tree
+is added above another or the same tree file is shown twice. On pages with
+several trees, give an explicit `id` to every node you link to; explicit ids
+never change.
+
 ### Errors
 
 Mistakes fail the build with the page, node and cause, for example
@@ -166,6 +171,51 @@ Mistakes fail the build with the page, node and cause, for example
 This covers invalid YAML, unknown keys, `body` together with `body_file`, a
 missing body file, a `body_file` or `base_path` outside the project root, unknown
 badges or icons, unsafe badge colours, duplicate ids and an unknown `selected`.
+For a tree loaded from a file, the message names the file too:
+`dirtree: index.md: trees/project.yaml: node 'src': unknown icon 'rocket'`.
+
+## Trees in their own files
+
+A large tree, or one shown on several pages, can live in its own YAML file.
+The fence then holds a single line:
+
+````markdown
+```dirtree
+src: trees/project.yaml
+```
+````
+
+The file has exactly the format of a fence's content (`root`, `selected`,
+`nodes`). Its path resolves against `base_path`, like `body_file`, so with
+`base_path = "snippets"` the file above is `snippets/trees/project.yaml`.
+`body_file` paths inside it resolve against `base_path` as well. Keep
+`watch = ["snippets"]` so edits to tree files rebuild the pages using them.
+
+`src` stands alone: `root`, `selected` and `nodes` belong in the file, and a
+tree file cannot load another one.
+
+### Editor validation
+
+The package ships a JSON Schema for tree files. Copy it next to them:
+
+```bash
+zensical-dirtree schema --output snippets/trees/dirtree.schema.json
+```
+
+and reference it from the first line of each tree file:
+
+```yaml
+# yaml-language-server: $schema=dirtree.schema.json
+root: your-project/
+nodes:
+  - label: …
+```
+
+Editors with YAML language support (VS Code with the Red Hat YAML extension,
+JetBrains IDEs, Neovim with yaml-language-server) then offer completion,
+show each key's description on hover and flag mistakes as you type. The schema
+is for editing only; the build still runs its own checks. Re-run the command
+after upgrading.
 
 ## Behaviour
 
@@ -199,8 +249,9 @@ badges or icons, unsafe badge colours, duplicate ids and an unknown `selected`.
 ## Example site
 
 `example/` exercises every feature: nesting, badges (named and raw colour),
-fields, `body` and `body_file`, icon overrides, two trees on one page, a table
-of deep links, and a second page for instant navigation.
+fields, `body` and `body_file`, icon overrides, status dots, two trees on one
+page, a table of deep links, a second page for instant navigation, and a tree
+loaded from a schema-checked YAML file.
 
 ```bash
 cd example && uv run zensical serve
@@ -213,4 +264,5 @@ uv sync
 uv run pytest                   # unit tests + real Zensical builds of example/
 uv run ruff check . && uv run ruff format --check .
 uv run zensical-dirtree install --docs-dir example/docs   # after editing assets
+uv run zensical-dirtree schema --output example/snippets/trees/dirtree.schema.json  # after editing the schema
 ```

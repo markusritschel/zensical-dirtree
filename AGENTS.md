@@ -34,6 +34,19 @@ block counter is copied in and out around each nested render so line anchors
 stay unique. The returned HTML is stashed by SuperFences, so panel titles and
 body headings never reach the page TOC.
 
+A fence holding only `src: <path>` is swapped for the YAML in that file before
+validation (`_Renderer.load_tree_file`); from there it is rendered like an
+inline tree. `src` and `body_file` share `_Renderer.resolve_file`, so both
+resolve against `base_path` with the same project-root check, not-found error
+and `watch` warning. While a tree file is rendered, `self.src` adds its path to
+every error message.
+
+`src/zensical_dirtree/dirtree.schema.json` documents the tree format for
+editors (`zensical-dirtree schema` copies it out). It is never used at build
+time. `tests/test_schema.py` keeps it in step with `TOP_KEYS`, `NODE_KEYS` and
+`ICONS` and checks both give the same verdict on sample trees, so **edit the
+schema whenever you change the node format**.
+
 Errors are `DirtreeError(SuperFencesException)`. SuperFences deliberately
 re-raises that class and swallows every other formatter exception, which would
 otherwise leave a raw code block and a green build.
@@ -43,8 +56,10 @@ docs dir. `dirtree.js` initialises each `[data-dirtree]` via `document$`, keeps
 per-widget state in a `WeakMap` (idempotent init), and registers one global
 `hashchange` listener, guarded by `window.__dirtreeLoaded`.
 
-`example/docs/{stylesheets,javascripts}/dirtree.*` are **copies** made by the
-CLI. Re-run the install command after editing the assets.
+`example/docs/{stylesheets,javascripts}/dirtree.*` and
+`example/snippets/trees/dirtree.schema.json` are **copies** made by the CLI.
+Re-run `install` / `schema --output` after editing the originals (a test fails
+when the schema copy is stale).
 
 ## Known limitations & improvements
 

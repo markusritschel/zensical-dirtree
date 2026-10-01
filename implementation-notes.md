@@ -44,6 +44,25 @@ Investigated against zensical 0.0.67 and pymdown-extensions 12.1 on 2026-09-30.
 - Zensical's `LinksExtension` postprocessor also rewrites links inside the
   stashed widget HTML (e.g. `link: reference.md` → `reference/`).
 
+### Body files inside docs/ (2026-10-01) → rejected, keep them outside
+
+Tested whether body files could live next to their pages:
+
+- Every `.md` under `docs/` is built as a page, including folders starting with
+  `_` (`docs/_dirtree/main-py.md` became `/_dirtree/main-py/` and was indexed by
+  search).
+- `exclude_docs` (MkDocs-style) is ignored by Zensical 0.0.67. The `exclude`
+  plugin works: `[project.plugins.exclude] glob = ["_dirtree/*.md"]` builds no
+  pages and the text is indexed only through the embedding page.
+- It does not remove the need for `watch`: an edited body file inside `docs/`
+  still left the embedding page stale until `watch` listed its folder.
+- Relative links in bodies still resolve against the embedding page.
+
+So colocation adds a required setting (the exclude glob, whose absence fails
+silently) and saves nothing. Decision: body files stay outside `docs/`. Large
+or reused trees go into their own YAML files instead (`src:`), with a JSON
+Schema for editor validation.
+
 ## Deviations
 
 - Added a build-time warning when `base_path` isn't watched (not in the spec;
