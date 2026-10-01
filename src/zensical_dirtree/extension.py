@@ -43,7 +43,8 @@ ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 #: nothing that could leave the style attribute.
 COLOUR_RE = re.compile(r"^[#\w\s(),.%/-]+$")
 
-TOP_KEYS = {"root", "nodes", "selected"}
+TOP_KEYS = {"root", "nodes", "selected", "contents_limit"}
+CONTENTS_LIMIT = 10  # "Contents" entries shown before "Show N more"
 NODE_KEYS = {
     "label",
     "id",
@@ -219,6 +220,7 @@ class _Renderer:
         self.context = _zensical_context(md)
         self.page = self.context.page.path if self.context else "<page>"
         self.src: str | None = None  # tree file, when loaded with ``src:``
+        self.contents_limit = CONTENTS_LIMIT
         self._inner: Markdown | None = None
 
     # -- errors
@@ -285,6 +287,11 @@ class _Renderer:
 
         nodes = [self.build(spec, None) for spec in specs]
         self.assign_ids(nodes)
+
+        limit = data.get("contents_limit", CONTENTS_LIMIT)
+        if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1:
+            raise self.error("'contents_limit' must be a positive integer")
+        self.contents_limit = limit
 
         root = data.get("root")
         selected = data.get("selected", nodes[0].id)
@@ -447,8 +454,10 @@ class _Renderer:
                 f'<p class="dirtree__more"><a href="{href}">Full docs →</a></p>'
             )
         if node.children:
+            limit = self.contents_limit
             entries = "".join(
-                '<li class="dirtree__entry">'
+                # With JS, entries past the limit hide behind "Show N more".
+                f'<li class="dirtree__entry{" dirtree__entry--extra" * (i >= limit)}">'
                 f'<a class="dirtree__entry-name" href="#{PREFIX}{c.id}">'
                 f"{_icon(self.icon_for(c))}{escape(c.label)}</a>"
                 + (
@@ -457,12 +466,19 @@ class _Renderer:
                     else ""
                 )
                 + "</li>"
-                for c in node.children
+                for i, c in enumerate(node.children)
+            )
+            hidden = len(node.children) - limit
+            more = (
+                '<button type="button" class="dirtree__show-more" '
+                f"data-dirtree-show-more hidden>Show {hidden} more</button>"
+                if hidden > 0
+                else ""
             )
             parts.append(
                 '<div class="dirtree__contents">'
                 '<p class="dirtree__contents-title">Contents</p>'
-                f'<ul class="dirtree__entries">{entries}</ul></div>'
+                f'<ul class="dirtree__entries">{entries}</ul>{more}</div>'
             )
         return (
             f'<section class="dirtree__panel" id="{pid}" data-panel="{node.id}" '

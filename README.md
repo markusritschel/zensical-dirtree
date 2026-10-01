@@ -131,6 +131,7 @@ nodes:
 | `nodes` | yes | Non-empty list of nodes. |
 | `root` | no | Label shown above the tree and at the start of each breadcrumb. |
 | `selected` | no | Id of the node selected on load. Default: the first node. |
+| `contents_limit` | no | Entries a folder's "Contents" list shows before a "Show N more" button. Default: 10. Without JavaScript the full list is shown. |
 
 ### Nodes
 

@@ -144,6 +144,17 @@
       select(li, { focus: true });
     });
 
+    // Long "Contents" lists end in "Show N more"; the markup has them all.
+    for (const button of root.querySelectorAll("[data-dirtree-show-more]")) {
+      button.hidden = false;
+      button.addEventListener("click", () => {
+        const extra = button.parentElement.querySelectorAll(".dirtree__entry--extra");
+        for (const li of extra) li.classList.remove("dirtree__entry--extra");
+        button.hidden = true;
+        extra[0].querySelector("a").focus(); // keep keyboard users in place
+      });
+    }
+
     const controller = {
       select: (id, scroll) => {
         const li = byId(id);

@@ -517,6 +517,33 @@
   background: color-mix(in srgb, var(--md-default-fg-color) 8%, transparent);
 }
 
+/* Past contents_limit, entries wait behind "Show N more" (JS only). */
+.md-typeset .dirtree.dirtree--js .dirtree__entries .dirtree__entry--extra {
+  display: none;
+}
+
+.md-typeset .dirtree .dirtree__show-more {
+  margin: 0.2rem 0 0;
+  padding: 0.25rem 0.55rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background: none;
+  color: var(--md-default-fg-color--light);
+  font: inherit;
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+
+.md-typeset .dirtree .dirtree__show-more[hidden] {
+  display: none;
+}
+
+.md-typeset .dirtree .dirtree__show-more:hover,
+.md-typeset .dirtree .dirtree__show-more:focus-visible {
+  background: var(--dirtree-hover);
+  color: var(--md-accent-fg-color);
+}
+
 .dirtree__entry:has(.dirtree__entry-name:focus-visible) {
   outline: 2px solid var(--md-accent-fg-color);
   outline-offset: -2px;

@@ -86,9 +86,12 @@ scroll the explorer into view:
 ## A second tree on the same page
 
 Ids are unique across the page, so two trees can sit side by side in the
-document. The second one has no `root` label.
+document. The second one has no `root` label, and its `contents_limit: 3`
+shortens the "Contents" list of `raw/` to three entries and a "Show 2 more"
+button.
 
 ````dirtree
+contents_limit: 3
 nodes:
   - label: data/
     expanded: true
@@ -101,6 +104,10 @@ nodes:
         summary: Untouched instrument output
         badges: [gitignored]
         children:
+          - label: 2026-09-26.csv
+          - label: 2026-09-27.csv
+          - label: 2026-09-28.csv
+          - label: 2026-09-29.csv
           - label: 2026-09-30.csv
             summary: One day of underway measurements
       - label: processed.nc

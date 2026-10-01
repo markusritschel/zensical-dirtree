@@ -154,6 +154,43 @@ def test_contents_entry_without_summary():
     assert "dirtree__entry-summary" not in entry.group(1)
 
 
+def folder(n: int, extra: str = "") -> str:
+    children = "".join(f"      - label: f{i}\n" for i in range(n))
+    return tree(f"{extra}nodes:\n  - label: d/\n    children:\n{children}")
+
+
+def test_contents_capped_at_ten_by_default():
+    html = render(folder(12))
+    assert html.count('<li class="dirtree__entry">') == 10
+    extras = re.findall(r'<li class="dirtree__entry dirtree__entry--extra">', html)
+    assert len(extras) == 2
+    # The last two children are the hidden ones, not some arbitrary pair.
+    assert re.search(r"dirtree__entry--extra\">.*?f10</a>.*?f11</a>", html, re.S)
+    assert re.search(
+        r'<button type="button" class="dirtree__show-more" '
+        r"data-dirtree-show-more hidden>Show 2 more</button></div>",
+        html,
+    ), html
+
+
+def test_contents_at_the_limit_are_not_capped():
+    html = render(folder(10))
+    assert "dirtree__entry--extra" not in html
+    assert "data-dirtree-show-more" not in html
+
+
+def test_contents_limit_option():
+    html = render(folder(3, "contents_limit: 2\n"))
+    assert html.count('<li class="dirtree__entry">') == 2
+    assert "Show 1 more" in html
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "'5'", "true", "2.5"])
+def test_contents_limit_must_be_a_positive_integer(value):
+    with pytest.raises(DirtreeError, match="contents_limit"):
+        render(folder(1, f"contents_limit: {value}\n"))
+
+
 def test_breadcrumb_links_ancestors():
     html = render(
         tree(
