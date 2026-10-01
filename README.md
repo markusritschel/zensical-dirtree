@@ -278,3 +278,7 @@ uv run pytest                   # unit tests + real Zensical builds of example/
 uv run ruff check . && uv run ruff format --check .
 uv run zensical-dirtree schema --output example/snippets/trees/dirtree.schema.json  # after editing the schema
 ```
+
+CI runs the same checks on Python 3.10–3.13, plus a build of the example site
+from the packaged wheel. Changes are recorded in `CHANGELOG.md`; the release
+process is described in `AGENTS.md`.

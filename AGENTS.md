@@ -65,6 +65,38 @@ into a docs dir instead. `dirtree.js` initialises each `[data-dirtree]` via
 Re-run `schema --output` after editing the original (a test fails when the
 copy is stale).
 
+## CI and releasing
+
+`.github/workflows/ci.yml` runs ruff, the tests on Python 3.10–3.13 and a
+package check (build the example with only the built wheel installed) on
+pushes to `main`/`develop` and on pull requests; a weekly run repeats the tests
+against the newest Zensical. `.github/workflows/release.yml` publishes on a
+`v*` tag: TestPyPI first, then PyPI, both via Trusted Publishing (no tokens).
+
+One-time setup (by the maintainer, not in the repo):
+
+1. Create `github.com/markusritschel/zensical-dirtree` and push `main` and
+   `develop`.
+2. In the repo settings, add the environments `testpypi` and `pypi`
+   (optionally with yourself as required reviewer on `pypi`).
+3. On test.pypi.org and pypi.org, add a *pending* trusted publisher: project
+   `zensical-dirtree`, owner `markusritschel`, repository `zensical-dirtree`,
+   workflow `release.yml`, environment `testpypi` / `pypi` respectively.
+
+Each release (git-flow: `develop` integrates, `main` holds releases):
+
+1. On `develop`, set `__version__` in `src/zensical_dirtree/__init__.py`, rename
+   `## [Unreleased]` in `CHANGELOG.md` to `## [x.y.z] - YYYY-MM-DD` (add a new
+   empty `[Unreleased]` above it and update the link references at the bottom),
+   and commit.
+2. `git switch main && git merge --ff-only develop` (or `--no-ff` once `main`
+   has release-only commits), then `git tag -a vx.y.z -m "vx.y.z"`.
+3. `git push origin main develop vx.y.z`. The release workflow refuses to
+   publish unless the tag, `__version__` and a `## [x.y.z]` changelog section
+   agree; check the TestPyPI upload with
+   `uv run --isolated --no-project --index https://test.pypi.org/simple/ --index-strategy unsafe-best-match --with zensical-dirtree==x.y.z -- zensical-dirtree --help`
+   before approving PyPI.
+
 ## Known limitations & improvements
 
 - [P2] Relative links inside a `body_file` resolve against the embedding page.
@@ -73,6 +105,8 @@ copy is stale).
   need a CSP that allows inline scripts (`inline_assets = false` otherwise).
 - [P3] Outside Zensical, bodies use the fixed `FALLBACK_EXTENSIONS` set.
 - [P3] The browser checks (keyboard, deep links, instant navigation, no-JS) ran
-  as a scratch Playwright script outside the suite; consider adding one.
-- [P3] Placeholder: the GitHub URL in README.md assumes
-  `github.com/markusritschel/zensical-dirtree`.
+  as a scratch Playwright script outside the suite; consider adding one as a
+  CI job.
+- [P3] Repository and PyPI URLs in `pyproject.toml`, README and CHANGELOG
+  assume `github.com/markusritschel/zensical-dirtree`; change them together if
+  the repo lives elsewhere.
