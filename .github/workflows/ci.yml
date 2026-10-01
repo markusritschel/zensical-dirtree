@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  schedule:
+    # Mondays: run the tests against the newest Zensical release, which is
+    # pre-1.0 and may change the internals the extension relies on.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Upgrade to the newest Zensical
+        if: github.event_name == 'schedule'
+        run: uv lock --upgrade-package zensical
+      - run: uv run pytest
+
+  package:
+    # Tests run against the source tree; this checks what users install.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - run: uv build
+      - name: Build the example site with only the built wheel installed
+        working-directory: example
+        run: |
+          uv run --isolated --no-project --with ../dist/*.whl --with zensical \
+            -- zensical build --clean
+          grep -q 'data-dirtree' site/index.html
+          grep -q 'data-dirtree' site/from-file/index.html
+      - name: Check the bundled schema and assets are reachable
+        run: |
+          uv run --isolated --no-project --with dist/*.whl \
+            -- zensical-dirtree schema > /dev/null
+          uv run --isolated --no-project --with dist/*.whl \
+            -- zensical-dirtree install --docs-dir example/docs
