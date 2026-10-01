@@ -166,8 +166,13 @@
     };
     controllers.set(root, controller);
     syncToggleAll();
-    if (!fromHash(location.hash)) {
-      select(items[0], { announce: false, hash: false }); // trees open on their first node
+    // A deep link into this tree selects its node. Every other tree, including
+    // the rest of the page's trees when the link targets one, opens on its first node.
+    const target =
+      location.hash.startsWith(`#${PREFIX}`) &&
+      document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (!(target && root.contains(target) && fromHash(location.hash))) {
+      select(items[0], { announce: false, hash: false });
     }
   }
 
