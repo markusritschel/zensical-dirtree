@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import textwrap
+from pathlib import Path
 
 import pytest
 import yaml
@@ -93,3 +94,19 @@ def test_valid_tree_passes_both():
 def test_invalid_trees_fail_both(text):
     assert not schema_accepts(text)
     assert not renderer_accepts(text)
+
+
+EXAMPLE_TREES = Path(__file__).parents[1] / "example" / "snippets" / "trees"
+
+
+@pytest.mark.parametrize("path", sorted(EXAMPLE_TREES.glob("*.yaml")), ids=str)
+def test_example_tree_files_match_the_schema(path):
+    errors = list(VALIDATOR.iter_errors(yaml.safe_load(path.read_text())))
+    assert not errors, [e.message for e in errors]
+
+
+def test_example_schema_copy_is_current():
+    copy = EXAMPLE_TREES / "dirtree.schema.json"
+    assert copy.read_bytes() == SCHEMA_PATH.read_bytes(), (
+        "re-run: zensical-dirtree schema --output " + str(copy)
+    )

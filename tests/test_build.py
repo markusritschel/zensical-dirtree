@@ -49,6 +49,17 @@ def test_example_builds(site):
     assert "Per-machine overrides" in search
 
 
+def test_tree_loaded_from_file(site):
+    result = build(site)
+    assert result.returncode == 0, result.stdout + result.stderr
+    html = (site / "site" / "from-file" / "index.html").read_text()
+    assert 'aria-label="ocean-obs/"' in html
+    assert 'data-selected="data-raw"' in html
+    # body_file inside the tree file, and a deep link from the page into it.
+    assert "processing entry point" in html
+    assert 'href="#dirtree-data-raw"' in html
+
+
 def test_invalid_tree_fails_the_build(site):
     page = site / "docs" / "second.md"
     page.write_text(

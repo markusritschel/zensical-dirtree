@@ -10,6 +10,7 @@ extra_javascript = ["javascripts/dirtree.js"]
 nav = [
   { "Explorer" = "index.md" },
   { "Second page" = "second.md" },
+  { "Tree from a file" = "from-file.md" },
   { "Reference" = "reference.md" },
 ]
 

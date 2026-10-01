@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "zensical-dirtree tree",
+  "description": "A directory tree for the zensical-dirtree Markdown extension, as written in a tree file loaded with `src:` (or inside a ```dirtree fence).",
+  "type": "object",
+  "required": ["nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "root": {
+      "type": "string",
+      "description": "Label shown above the tree and at the start of each breadcrumb."
+    },
+    "selected": {
+      "type": "string",
+      "description": "Id of the node selected on load. Default: the first node."
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Top-level nodes of the tree.",
+      "items": { "$ref": "#/$defs/node" }
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "required": ["label"],
+      "additionalProperties": false,
+      "not": {
+        "required": ["body", "body_file"],
+        "description": "Use either 'body' or 'body_file', not both."
+      },
+      "properties": {
+        "label": {
+          "type": ["string", "number"],
+          "minLength": 1,
+          "description": "Display name. A trailing '/' or a 'children' key makes the node a folder."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "description": "Slug for deep links (#dirtree-<id>). Default: the slugified label path, e.g. src-main-py. Must be unique on the page."
+        },
+        "summary": {
+          "type": "string",
+          "description": "One line under the title, also shown in the parent's Contents list. Inline Markdown."
+        },
+        "body": {
+          "type": "string",
+          "description": "Markdown shown in the node's panel. Mutually exclusive with 'body_file'."
+        },
+        "body_file": {
+          "type": "string",
+          "description": "Markdown file for the panel, relative to the extension's base_path. Mutually exclusive with 'body'."
+        },
+        "badges": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Keys from the badge configuration in zensical.toml."
+        },
+        "fields": {
+          "type": "array",
+          "description": "Label/value callouts shown in the panel.",
+          "items": {
+            "type": "object",
+            "required": ["label", "value"],
+            "properties": {
+              "label": { "description": "Field label." },
+              "value": { "description": "Field value. Inline Markdown." }
+            }
+          }
+        },
+        "link": {
+          "type": "string",
+          "description": "Target of a 'Full docs' link. Relative .md links are resolved like any page link."
+        },
+        "children": {
+          "type": ["array", "null"],
+          "items": { "$ref": "#/$defs/node" },
+          "description": "Child nodes. Makes the node a folder."
+        },
+        "expanded": {
+          "type": "boolean",
+          "description": "Folder starts open. Default: false."
+        },
+        "icon": {
+          "enum": ["folder", "file", "code", "config", "md"],
+          "description": "Icon override. Default: derived from type and file extension."
+        }
+      }
+    }
+  }
+}

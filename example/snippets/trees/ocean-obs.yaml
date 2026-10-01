@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=dirtree.schema.json
+#
+# A whole tree in its own file, loaded on a page with:
+#
+#   ````dirtree
+#   src: trees/ocean-obs.yaml
+#   ````
+#
+# The schema line above gives editors completion and live checks.
+root: ocean-obs/
+selected: data-raw
+nodes:
+  - label: pyproject.toml
+    badges: [committed]
+    summary: Package metadata and tool settings
+    body: |
+      Dependencies and tool settings for the processing package.
+
+      ```toml
+      [project]
+      name = "ocean-obs"
+      dependencies = ["xarray", "netCDF4"]
+      ```
+  - label: data/
+    expanded: true
+    summary: Measurements, from instrument output to gridded products
+    children:
+      - label: raw/
+        id: data-raw
+        badges: [gitignored]
+        summary: Untouched instrument files, never edited
+        fields:
+          - label: Written by
+            value: The ship's logging system
+          - label: Size
+            value: About 2 GB per cruise
+        body: |
+          Raw files stay exactly as the instrument wrote them, so every
+          processing step can be rerun from scratch. They are too large for
+          git and are synced from the archive instead.
+      - label: processed/
+        badges: [generated]
+        summary: Quality-controlled, gridded output
+        children:
+          - label: underway.nc
+            badges: [generated]
+            summary: One file per cruise
+            fields:
+              - label: Written by
+                value: "`make process`"
+  - label: notebooks/
+    summary: Exploration and figures
+    children:
+      - label: overview.ipynb
+        badges: [committed]
+        summary: Cruise track and first look at the data
+  - label: process.py
+    badges: [committed]
+    summary: Turns raw files into processed ones
+    body_file: process-py.md
