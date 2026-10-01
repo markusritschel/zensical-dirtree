@@ -218,12 +218,14 @@ class _Renderer:
         self.md = md
         self.context = _zensical_context(md)
         self.page = self.context.page.path if self.context else "<page>"
+        self.src: str | None = None  # tree file, when loaded with ``src:``
         self._inner: Markdown | None = None
 
     # -- errors
 
     def error(self, message: str, node: Node | None = None) -> DirtreeError:
-        where = f"node '{node.path}': " if node else ""
+        where = f"{self.src}: " if self.src else ""
+        where += f"node '{node.path}': " if node else ""
         return DirtreeError(f"dirtree: {self.page}: {where}{message}")
 
     # -- Markdown
@@ -272,6 +274,8 @@ class _Renderer:
             raise self.error(f"invalid YAML: {error}") from None
         if not isinstance(data, dict):
             raise self.error("block must be a mapping with a 'nodes' list")
+        if "src" in data:
+            data = self.load_tree_file(data)
         for key in data:
             if key not in TOP_KEYS:
                 raise self.error(f"unknown key '{key}'")
@@ -524,7 +528,8 @@ class _Renderer:
             return self.markdown(self.read_body_file(node))
         return ""
 
-    def read_body_file(self, node: Node) -> str:
+    def resolve_file(self, path: str, key: str, node: Node | None = None) -> Path:
+        """Resolve a ``body_file`` or ``src`` path against ``base_path``."""
         if self.context:
             root = Path(self.context.config["root_dir"]).resolve()
         else:
@@ -534,15 +539,41 @@ class _Renderer:
             raise self.error(f"base_path {base} is outside the project root {root}")
         if self.context:
             _warn_if_unwatched(self.context.config, base)
-        target = (base / node.spec["body_file"]).resolve()
+        target = (base / path).resolve()
         if not target.is_relative_to(root):
             raise self.error(
-                f"body_file resolves to {target}, outside the project root {root}",
-                node,
+                f"{key} resolves to {target}, outside the project root {root}", node
             )
         if not target.is_file():
-            raise self.error(f"body_file not found: {target}", node)
-        return target.read_text(encoding="utf-8")
+            raise self.error(f"{key} not found: {target}", node)
+        return target
+
+    def read_body_file(self, node: Node) -> str:
+        path = self.resolve_file(node.spec["body_file"], "body_file", node)
+        return path.read_text(encoding="utf-8")
+
+    def load_tree_file(self, data: dict[str, Any]) -> dict[str, Any]:
+        """Replace a ``src:`` fence with the tree in the file it names."""
+        src = data["src"]
+        if not isinstance(src, str):
+            raise self.error("'src' must be a string")
+        others = sorted(str(key) for key in data if key != "src")
+        if others:
+            raise self.error(
+                f"'src' cannot be combined with {', '.join(others)}; "
+                "put them in the tree file"
+            )
+        path = self.resolve_file(src, "src")
+        self.src = src
+        try:
+            tree = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except yaml.YAMLError as error:
+            raise self.error(f"invalid YAML: {error}") from None
+        if not isinstance(tree, dict):
+            raise self.error("tree file must be a mapping with a 'nodes' list")
+        if "src" in tree:
+            raise self.error("a tree file cannot use 'src'")
+        return tree
 
 
 # -- extension -------------------------------------------------------------------

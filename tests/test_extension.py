@@ -478,6 +478,98 @@ def test_base_path_traversal_is_error():
         render(tree("nodes:\n  - label: a\n    body_file: x.md\n"), base_path="..")
 
 
+# -- trees from files --------------------------------------------------------
+
+
+@pytest.fixture
+def tree_file(project):
+    """Write a tree file under snippets/trees/ and return its src path."""
+
+    def write(text: str, name: str = "t.yaml") -> str:
+        path = project / "snippets" / "trees" / name
+        path.parent.mkdir(exist_ok=True)
+        path.write_text(textwrap.dedent(text).lstrip())
+        return f"trees/{name}"
+
+    return write
+
+
+def test_src_loads_whole_tree_from_file(project, tree_file):
+    (project / "snippets" / "main.md").write_text("From *body file*.\n")
+    src = tree_file(
+        """
+        root: proj/
+        selected: src-main-py
+        nodes:
+          - label: src/
+            children:
+              - label: main.py
+                summary: Entry point
+                body_file: main.md
+        """
+    )
+    html = render(tree(f"src: {src}\n"), base_path="snippets")
+    assert 'aria-label="proj/"' in html
+    assert 'data-selected="src-main-py"' in html
+    assert "Entry point" in html
+    # body_file inside a tree file still resolves against base_path.
+    assert "From <em>body file</em>." in html
+
+
+def test_same_tree_file_twice_on_one_page(tree_file):
+    src = tree_file("nodes:\n  - label: a.txt\n")
+    html = render(
+        tree(f"src: {src}\n") + "\n" + tree(f"src: {src}\n"), base_path="snippets"
+    )
+    assert 'id="dirtree-a-txt"' in html
+    assert 'id="dirtree-a-txt-2"' in html
+
+
+def test_src_cannot_be_combined_with_other_keys(tree_file):
+    src = tree_file("nodes:\n  - label: a\n")
+    with pytest.raises(DirtreeError, match="'src' cannot be combined"):
+        render(tree(f"src: {src}\nselected: a\n"))
+
+
+def test_src_must_be_a_string():
+    with pytest.raises(DirtreeError, match="'src' must be a string"):
+        render(tree("src: [a, b]\n"))
+
+
+def test_missing_tree_file_is_error(project):
+    with pytest.raises(DirtreeError) as info:
+        render(tree("src: trees/nope.yaml\n"), base_path="snippets")
+    assert str(project / "snippets" / "trees" / "nope.yaml") in str(info.value)
+    assert "src not found" in str(info.value)
+
+
+def test_tree_file_traversal_is_error(project):
+    (project.parent / "outside.yaml").write_text("nodes:\n  - label: a\n")
+    with pytest.raises(DirtreeError, match="outside the project root"):
+        render(tree("src: ../../outside.yaml\n"), base_path="snippets")
+
+
+def test_invalid_yaml_in_tree_file_names_the_file(tree_file):
+    src = tree_file("nodes: [\n")
+    with pytest.raises(DirtreeError, match=rf"^dirtree: <page>: {src}: invalid YAML"):
+        render(tree(f"src: {src}\n"), base_path="snippets")
+
+
+def test_errors_in_tree_file_name_page_file_and_node(tree_file):
+    src = tree_file("nodes:\n  - label: a\n    icon: rocket\n")
+    with pytest.raises(
+        DirtreeError, match=rf"^dirtree: <page>: {src}: node 'a': unknown icon"
+    ):
+        render(tree(f"src: {src}\n"), base_path="snippets")
+
+
+def test_tree_file_cannot_use_src(tree_file):
+    inner = tree_file("nodes:\n  - label: a\n", name="inner.yaml")
+    outer = tree_file(f"src: {inner}\n", name="outer.yaml")
+    with pytest.raises(DirtreeError, match="a tree file cannot use 'src'"):
+        render(tree(f"src: {outer}\n"), base_path="snippets")
+
+
 # -- escaping, TOC, validation ----------------------------------------------
 
 
