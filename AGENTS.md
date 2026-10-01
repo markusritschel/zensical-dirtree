@@ -10,7 +10,6 @@ uv sync
 uv run pytest                              # unit + Zensical integration tests
 uv run ruff check . && uv run ruff format --check .
 cd example && uv run zensical serve        # manual check in a browser
-uv run zensical-dirtree install --docs-dir example/docs   # after editing assets
 ```
 
 ## Architecture
@@ -51,20 +50,25 @@ Errors are `DirtreeError(SuperFencesException)`. SuperFences deliberately
 re-raises that class and swallows every other formatter exception, which would
 otherwise leave a raw code block and a green build.
 
-The assets live in `src/zensical_dirtree/assets/`. `cli.py` copies them into a
-docs dir. `dirtree.js` initialises each `[data-dirtree]` via `document$`, keeps
+The assets live in `src/zensical_dirtree/assets/`. By default
+`DirtreeExtension.format` prepends them inline to a page's first tree
+(`assets_inlined` is reset per page like `used_ids`), the CSS wrapped in
+`@layer dirtree` so unlayered site CSS overrides it. Zensical re-runs inline
+scripts on instant navigation. With `inline_assets = false`, `cli.py` copies
+them into a docs dir instead. `dirtree.js` initialises each `[data-dirtree]` via `document$`, keeps
 per-widget state in a `WeakMap` (idempotent init), and registers one global
 `hashchange` listener, guarded by `window.__dirtreeLoaded`.
 
-`example/docs/{stylesheets,javascripts}/dirtree.*` and
-`example/snippets/trees/dirtree.schema.json` are **copies** made by the CLI.
-Re-run `install` / `schema --output` after editing the originals (a test fails
-when the schema copy is stale).
+`example/snippets/trees/dirtree.schema.json` is a **copy** made by the CLI.
+Re-run `schema --output` after editing the original (a test fails when the
+copy is stale).
 
 ## Known limitations & improvements
 
 - [P2] Relative links inside a `body_file` resolve against the embedding page.
 - [P2] `watch` must be set by the user (Zensical computes it before extensions load).
+- [P3] Inlined assets (~6 KB gzipped) repeat on every page with a tree and
+  need a CSP that allows inline scripts (`inline_assets = false` otherwise).
 - [P3] Outside Zensical, bodies use the fixed `FALLBACK_EXTENSIONS` set.
 - [P3] The browser checks (keyboard, deep links, instant navigation, no-JS) ran
   as a scratch Playwright script outside the suite; consider adding one.

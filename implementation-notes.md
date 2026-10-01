@@ -63,6 +63,23 @@ silently) and saves nothing. Decision: body files stay outside `docs/`. Large
 or reused trees go into their own YAML files instead (`src:`), with a JSON
 Schema for editor validation.
 
+### Asset setup (2026-10-01) → inline by default
+
+- Zensical has no third-party plugin API and fixes `extra_css` /
+  `extra_javascript` before extensions load, so an extension cannot register
+  its assets. It can only emit them in its own HTML.
+- Instant navigation re-creates every `<script>` in the swapped-in content, so
+  inline scripts run on navigated pages too. Verified with Playwright and
+  `site_url` set (instant navigation is off without it): starting on a page
+  with no tree, then navigating to tree pages and back, every widget
+  initialises with no errors. `window.__dirtreeLoaded` makes the re-run harmless.
+- An inline `<style>` in the body comes after `extra_css` in the cascade and
+  beat a user override of equal specificity. Inside `@layer dirtree` it loses
+  to unlayered user CSS, so overriding works as before. Verified both ways.
+- The inlined text stays out of `search.json`.
+- Cost: about 6 KB gzipped per page with a tree, not shared between pages.
+  `inline_assets = false` restores the copied-file setup for strict CSP.
+
 ## Deviations
 
 - Added a build-time warning when `base_path` isn't watched (not in the spec;
