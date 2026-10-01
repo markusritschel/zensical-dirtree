@@ -47,6 +47,12 @@ def test_example_builds(site):
     assert len(ids) == len(set(ids)), "duplicate ids on the page"
     search = (site / "site" / "search.json").read_text()
     assert "Per-machine overrides" in search
+    # Assets come inlined, once per page, and stay out of the search index.
+    assert html.count("<style>/* zensical-dirtree") == 1
+    assert html.count("window.__dirtreeLoaded = true") == 1
+    assert "__dirtreeLoaded" not in search
+    reference = (site / "site" / "reference" / "index.html").read_text()
+    assert "zensical-dirtree: layout" not in reference
 
 
 def test_tree_loaded_from_file(site):

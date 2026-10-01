@@ -15,11 +15,7 @@ disabled.
 ```bash
 uv add git+https://github.com/markusritschel/zensical-dirtree
 # or: pip install git+https://github.com/markusritschel/zensical-dirtree
-zensical-dirtree install --docs-dir docs
 ```
-
-The last command copies `dirtree.css` and `dirtree.js` into
-`docs/stylesheets/` and `docs/javascripts/`. Re-run it after upgrading.
 
 ## Configure
 
@@ -27,8 +23,6 @@ In `zensical.toml`:
 
 ```toml
 [project]
-extra_css = ["stylesheets/dirtree.css"]
-extra_javascript = ["javascripts/dirtree.js"]
 watch = ["snippets"]            # same as base_path; see below
 
 [project.markdown_extensions.pymdownx.superfences]
@@ -53,6 +47,16 @@ Things to know:
   List them again next to `zensical_dirtree`. Sites created with `zensical new`
   already list them all; otherwise copy the complete default list from
   [`example/zensical.toml`](example/zensical.toml).
+- **No stylesheet or script to set up.** The extension inlines both before the
+  first tree on each page (about 6 KB gzipped). The `--dirtree-*` custom
+  properties (see [Icon colours](#icon-colours)) can be overridden from a
+  stylesheet of your own (`extra_css`) as before. Since the inlined CSS comes
+  after your stylesheets, any other rule needs a more specific selector than
+  the one it overrides, e.g. prefixed with `.md-typeset`. If your Content
+  Security Policy forbids inline scripts, or you
+  want to replace the script, set `inline_assets = false`, run
+  `zensical-dirtree install --docs-dir docs` (again after each upgrade) and
+  list the two copied files in `extra_css` and `extra_javascript`.
 - **Add `base_path` to `watch`.** Zensical caches each page by its own source.
   Without `watch`, an edited body file is ignored by `zensical serve` **and by
   `zensical build`** until the page that embeds it changes. With it, every edit
@@ -262,6 +266,5 @@ cd example && uv run zensical serve
 uv sync
 uv run pytest                   # unit tests + real Zensical builds of example/
 uv run ruff check . && uv run ruff format --check .
-uv run zensical-dirtree install --docs-dir example/docs   # after editing assets
 uv run zensical-dirtree schema --output example/snippets/trees/dirtree.schema.json  # after editing the schema
 ```

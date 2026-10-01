@@ -5,8 +5,6 @@ docs_dir = "docs"
 # source, so without this line edits to body files are ignored by both
 # `serve` and `build` until the embedding page itself changes.
 watch = ["snippets"]
-extra_css = ["stylesheets/dirtree.css"]
-extra_javascript = ["javascripts/dirtree.js"]
 nav = [
   { "Explorer" = "index.md" },
   { "Second page" = "second.md" },

@@ -1,8 +1,9 @@
 """Command-line helpers for zensical-dirtree.
 
-Zensical does not load third-party plugins, so the stylesheet and script live
-in the docs directory like any other custom asset, and the JSON Schema for tree
-files is copied next to them for editors to pick up:
+The extension inlines its stylesheet and script by default. Sites that set
+``inline_assets = false`` copy them into the docs directory like any other
+custom asset instead. The JSON Schema for tree files is copied out for editors
+to pick up:
 
     zensical-dirtree install [--docs-dir docs]
     zensical-dirtree schema [--output snippets/trees/dirtree.schema.json]
@@ -41,6 +42,7 @@ def install(docs_dir: Path) -> int:
         '  watch = ["snippets"]   # your base_path, so body edits rebuild\n\n'
         "  [project.markdown_extensions.zensical_dirtree]\n"
         '  base_path = "snippets"\n'
+        "  inline_assets = false\n"
     )
     return 0
 

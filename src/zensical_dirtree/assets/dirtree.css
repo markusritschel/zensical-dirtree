@@ -1,9 +1,11 @@
 /* zensical-dirtree: layout and theme for the [data-dirtree] widget.
  * Colours come from the theme's variables, so light/dark and custom palettes
  * follow automatically. Only the badge and icon palettes are defined here;
- * override any --dirtree-* property in your own stylesheet to change them. */
+ * override any --dirtree-* property in your own stylesheet to change them.
+ * The defaults sit in :where() because this sheet is usually inlined after
+ * the site's own stylesheets, which must still win. */
 
-.dirtree {
+:where(.dirtree) {
   --dirtree-border: var(--md-default-fg-color--lightest);
   --dirtree-hover: color-mix(
     in srgb,
@@ -34,12 +36,15 @@
   --dirtree-icon-config: #6b7689;
   --dirtree-icon-md: #8a5fd1;
   --dirtree-icon-file: #7d8590;
+}
+
+.dirtree {
   margin: 1.5em 0;
   border: 1px solid var(--dirtree-border);
   border-radius: 0.6rem;
 }
 
-[data-md-color-scheme="slate"] .dirtree {
+:where([data-md-color-scheme="slate"]) .dirtree {
   --dirtree-green: #3fb950;
   --dirtree-orange: #fb923c;
   --dirtree-amber: #d29922;
