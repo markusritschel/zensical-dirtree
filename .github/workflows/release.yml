@@ -42,6 +42,7 @@ jobs:
           uv run --isolated --no-project --with ../dist/*.whl --with zensical \
             -- zensical build --clean
           grep -q 'data-dirtree' site/index.html
+          grep -q '__dirtreeLoaded' site/index.html
 
       - uses: actions/upload-artifact@v7
         with:

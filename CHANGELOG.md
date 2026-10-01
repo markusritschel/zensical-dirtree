@@ -4,9 +4,10 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-After upgrading, re-run `zensical-dirtree install --docs-dir docs` (the
-stylesheet and script are copies) and `zensical-dirtree schema --output …` if
-you use tree files, then rebuild once with `zensical build --clean`.
+After upgrading, rebuild once with `zensical build --clean` (cached pages hold
+the previous version's inlined stylesheet and script). Re-run
+`zensical-dirtree schema --output …` if you use tree files, and
+`zensical-dirtree install --docs-dir docs` if you set `inline_assets = false`.
 
 ## [Unreleased]
 
@@ -31,6 +32,9 @@ First release.
   expand/collapse all, instant-navigation support, light and dark mode, and a
   stacked layout on narrow screens.
 - Build errors that name the page, the tree file and the node.
-- `zensical-dirtree install` to copy the stylesheet and script into `docs/`.
+- The stylesheet and script are inlined before the first tree on each page, so
+  there is nothing to set up besides the Markdown extension. For a strict
+  Content Security Policy, `inline_assets = false` and
+  `zensical-dirtree install` copy them into `docs/` instead.
 
 [Unreleased]: https://github.com/markusritschel/zensical-dirtree/commits/develop

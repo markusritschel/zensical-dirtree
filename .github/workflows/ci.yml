@@ -52,9 +52,14 @@ jobs:
             -- zensical build --clean
           grep -q 'data-dirtree' site/index.html
           grep -q 'data-dirtree' site/from-file/index.html
-      - name: Check the bundled schema and assets are reachable
+          # The stylesheet and script are inlined from the package data.
+          grep -q '__dirtreeLoaded' site/index.html
+      - name: Check the bundled schema and copyable assets are reachable
         run: |
           uv run --isolated --no-project --with dist/*.whl \
             -- zensical-dirtree schema > /dev/null
+          mkdir -p "$RUNNER_TEMP/docs"
           uv run --isolated --no-project --with dist/*.whl \
-            -- zensical-dirtree install --docs-dir example/docs
+            -- zensical-dirtree install --docs-dir "$RUNNER_TEMP/docs"
+          test -s "$RUNNER_TEMP/docs/stylesheets/dirtree.css"
+          test -s "$RUNNER_TEMP/docs/javascripts/dirtree.js"
