@@ -9,7 +9,7 @@ import pytest
 from markdown import Markdown
 from pymdownx.superfences import SuperFencesException
 
-from zensical_dirtree import DirtreeError
+from zensical_dirtree import DirtreeError, DirtreeExtension, asset_path
 
 BADGES = {
     "committed": {"label": "committed", "color": "green"},
@@ -21,6 +21,8 @@ def make_md(
     *, toc: bool = False, superfences: bool = True, anchors: bool = False, **config
 ) -> Markdown:
     config.setdefault("badges", BADGES)
+    # The inlined CSS/JS would trip markup assertions; asset tests opt in.
+    config.setdefault("inline_assets", False)
     extensions = ["pymdownx.highlight", "zensical_dirtree"]
     if superfences:
         extensions.insert(0, "pymdownx.superfences")
@@ -633,6 +635,49 @@ def test_tree_file_cannot_use_src(tree_file):
     outer = tree_file(f"src: {inner}\n", name="outer.yaml")
     with pytest.raises(DirtreeError, match="a tree file cannot use 'src'"):
         render(tree(f"src: {outer}\n"), base_path="snippets")
+
+
+# -- inlined assets ----------------------------------------------------------
+
+
+def test_assets_inlined_by_default():
+    assert DirtreeExtension().getConfig("inline_assets") is True
+
+
+def test_assets_inlined_once_per_page():
+    one = tree("nodes:\n  - label: a.txt\n")
+    html = render(one + "\n" + one, inline_assets=True)
+    assert html.count("<style>") == 1
+    assert html.count("<script>") == 1
+    assert html.index("<style>") < html.index('class="dirtree"')
+    assert asset_path("dirtree.js").read_text() in html
+
+
+def test_inlined_css_sits_in_a_cascade_layer():
+    # Layered styles lose to the site's own extra_css, whatever the order.
+    html = render(tree("nodes:\n  - label: a\n"), inline_assets=True)
+    css = asset_path("dirtree.css").read_text()
+    assert f"<style>@layer dirtree {{\n{css}\n}}</style>" in html
+
+
+def test_assets_inlined_again_on_the_next_page():
+    md = make_md(inline_assets=True)
+    md.convert(tree("nodes:\n  - label: a\n"))
+    md.reset()
+    assert "<script>" in md.convert(tree("nodes:\n  - label: a\n"))
+
+
+def test_no_assets_on_a_page_without_a_tree():
+    html = render("# Title\n\n```python\nx = 1\n```\n", inline_assets=True)
+    assert "<style>" not in html
+    assert "<script>" not in html
+
+
+def test_inline_assets_can_be_disabled():
+    html = render(tree("nodes:\n  - label: a\n"), inline_assets=False)
+    assert "<style>" not in html
+    assert "<script>" not in html
+    assert 'class="dirtree"' in html
 
 
 # -- escaping, TOC, validation ----------------------------------------------

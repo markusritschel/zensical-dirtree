@@ -627,14 +627,31 @@ class _RegisterFence(Preprocessor):
         return lines
 
 
+def _inline_assets() -> str:
+    """The stylesheet and script, so sites need no extra_css/extra_javascript.
+
+    The CSS sits in a cascade layer: unlayered rules in the site's own
+    stylesheets beat it whatever their order, so it stays easy to override.
+    """
+    assets = Path(__file__).parent / "assets"
+    css = (assets / "dirtree.css").read_text(encoding="utf-8")
+    js = (assets / "dirtree.js").read_text(encoding="utf-8")
+    return f"<style>@layer dirtree {{\n{css}\n}}</style>\n<script>{js}</script>\n"
+
+
 class DirtreeExtension(Extension):
     def __init__(self, **kwargs: Any) -> None:
         self.config = {
             "base_path": [".", "Where body_file paths resolve, from the project root."],
             "badges": [{}, "Badge definitions: key -> {label, color}."],
+            "inline_assets": [
+                True,
+                "Inline the stylesheet and script before a page's first tree.",
+            ],
         }
         super().__init__(**kwargs)
         self.used_ids: set[str] = set()
+        self.assets_inlined = False
 
     @property
     def badges(self) -> dict[str, Any]:
@@ -648,9 +665,14 @@ class DirtreeExtension(Extension):
 
     def reset(self) -> None:
         self.used_ids = set()
+        self.assets_inlined = False
 
     def format(self, src: str, language: str, md: Markdown, **_kwargs: Any) -> str:
-        return _Renderer(self, md).render(src)
+        html = _Renderer(self, md).render(src)
+        if self.getConfig("inline_assets") and not self.assets_inlined:
+            self.assets_inlined = True
+            html = _inline_assets() + html
+        return html
 
 
 def makeExtension(**kwargs: Any) -> DirtreeExtension:  # noqa: N802 - Markdown API
