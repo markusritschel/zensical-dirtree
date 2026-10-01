@@ -1,9 +1,11 @@
-"""Copy the bundled assets into a docs directory.
+"""Command-line helpers for zensical-dirtree.
 
 Zensical does not load third-party plugins, so the stylesheet and script live
-in the docs directory like any other custom asset:
+in the docs directory like any other custom asset, and the JSON Schema for tree
+files is copied next to them for editors to pick up:
 
     zensical-dirtree install [--docs-dir docs]
+    zensical-dirtree schema [--output snippets/trees/dirtree.schema.json]
 """
 
 from __future__ import annotations
@@ -13,7 +15,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from zensical_dirtree import ASSETS, asset_path
+from zensical_dirtree import ASSETS, SCHEMA_PATH, asset_path
 
 #: Conventional locations, matching the theme's own documentation.
 SUBDIRS = {".css": "stylesheets", ".js": "javascripts"}
@@ -43,6 +45,20 @@ def install(docs_dir: Path) -> int:
     return 0
 
 
+def schema(output: Path | None) -> int:
+    if output is None:
+        sys.stdout.write(SCHEMA_PATH.read_text(encoding="utf-8"))
+        return 0
+    output.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(SCHEMA_PATH, output)
+    print(f"Wrote {output}")
+    print(
+        "\nReference it from the first line of a tree file, relative to that file:"
+        f"\n\n  # yaml-language-server: $schema={output.name}"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="zensical-dirtree",
@@ -56,7 +72,17 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         help="path to the docs directory (default: docs)",
     )
+    schemer = sub.add_parser(
+        "schema", help="print or write the JSON Schema for tree files"
+    )
+    schemer.add_argument(
+        "--output",
+        type=Path,
+        help="write the schema to this file instead of printing it",
+    )
     args = parser.parse_args(argv)
+    if args.command == "schema":
+        return schema(args.output)
     return install(args.docs_dir)
 
 

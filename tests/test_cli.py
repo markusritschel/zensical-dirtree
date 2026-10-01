@@ -1,4 +1,6 @@
-from zensical_dirtree import asset_path
+import json
+
+from zensical_dirtree import SCHEMA_PATH, asset_path
 from zensical_dirtree.cli import main
 
 
@@ -23,3 +25,15 @@ def test_install_overwrites_stale_assets(tmp_path):
 def test_install_missing_docs_dir(tmp_path, capsys):
     assert main(["install", "--docs-dir", str(tmp_path / "nope")]) == 1
     assert "No such directory" in capsys.readouterr().err
+
+
+def test_schema_prints_to_stdout(capsys):
+    assert main(["schema"]) == 0
+    assert json.loads(capsys.readouterr().out) == json.loads(SCHEMA_PATH.read_text())
+
+
+def test_schema_writes_output_file(tmp_path, capsys):
+    target = tmp_path / "trees" / "dirtree.schema.json"
+    assert main(["schema", "--output", str(target)]) == 0
+    assert target.read_bytes() == SCHEMA_PATH.read_bytes()
+    assert "yaml-language-server: $schema=" in capsys.readouterr().out

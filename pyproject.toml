@@ -26,7 +26,12 @@ dependencies = [
 zensical-dirtree = "zensical_dirtree.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.6", "zensical>=0.0.60"]
+dev = [
+    "jsonschema>=4.26.0",
+    "pytest>=8",
+    "ruff>=0.6",
+    "zensical>=0.0.60",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/zensical_dirtree"]
