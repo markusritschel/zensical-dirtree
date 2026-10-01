@@ -1,0 +1,85 @@
+name: Release
+
+# Pushing a tag like v0.1.0 builds the package, publishes it to TestPyPI and
+# then to PyPI. Both use Trusted Publishing (OpenID Connect): no API token is
+# stored in the repository. Each index must list this repository, this
+# workflow file (release.yml) and the matching environment as a trusted
+# publisher; see "Releasing" in AGENTS.md.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+
+      - name: Check that tag, package version and changelog agree
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          package=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/zensical_dirtree/__init__.py)
+          if [ "$tag" != "$package" ]; then
+            echo "::error::Tag v$tag does not match __version__ $package"
+            exit 1
+          fi
+          if ! grep -q "^## \[$tag\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [$tag]' section"
+            exit 1
+          fi
+
+      - run: uv run --locked pytest
+      - run: uv build
+
+      - name: Build the example site with only the built wheel installed
+        working-directory: example
+        run: |
+          uv run --isolated --no-project --with ../dist/*.whl --with zensical \
+            -- zensical build --clean
+          grep -q 'data-dirtree' site/index.html
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  testpypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/zensical-dirtree
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          # Re-running a release after a failure later on must not stop here.
+          skip-existing: true
+
+  pypi:
+    needs: testpypi
+    runs-on: ubuntu-latest
+    environment:
+      # Add yourself as a required reviewer on this environment to approve
+      # each PyPI upload by hand.
+      name: pypi
+      url: https://pypi.org/p/zensical-dirtree
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
