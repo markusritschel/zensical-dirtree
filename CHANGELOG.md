@@ -21,6 +21,10 @@ First release.
   rendered with the site's own Markdown settings; summaries, fields, links and
   badges with named or raw colours.
 - Badges marked `indicator = true` show as a status dot in the tree.
+- A folder's Contents list shows `contents_limit` entries (default 10, set per
+  tree), then a "Show N more" button; without JavaScript the full list shows.
+- A node's summary also appears as a tooltip on its tree row.
+- Every tree opens on its first node; deep links select any other node.
 - Whole trees in their own YAML files, loaded with `src:`, and a bundled JSON
   Schema for editor completion and validation (`zensical-dirtree schema`).
 - Keyboard navigation (WAI-ARIA tree pattern), deep links (`#dirtree-<id>`),
