@@ -92,6 +92,10 @@ document. The second one has no `root` label.
 nodes:
   - label: data/
     expanded: true
+    summary: Measurement data, raw and processed
+    body: |
+      Raw files are never edited: every correction happens in the processing
+      step, so `processed.nc` can always be rebuilt from `raw/`.
     children:
       - label: raw/
         summary: Untouched instrument output
