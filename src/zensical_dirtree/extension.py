@@ -38,7 +38,7 @@ PREFIX = "dirtree-"
 REGISTER_PRIORITY = 27
 
 FENCE_RE = re.compile(rf"^\s*(`{{3,}}|~{{3,}})\s*{FENCE}\s*$")
-ID_RE = re.compile(r"^[\w-]+$")
+ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 #: Loose allow-list for raw CSS colours: enough for hex, names and functions,
 #: nothing that could leave the style attribute.
 COLOUR_RE = re.compile(r"^[#\w\s(),.%/-]+$")

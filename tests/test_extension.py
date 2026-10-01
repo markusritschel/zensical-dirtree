@@ -213,6 +213,12 @@ def test_auto_id_avoids_explicit_id_declared_later():
     assert html.count('data-node="a-b"') == 1
 
 
+@pytest.mark.parametrize("bad", ["größe", "a b", "a.b"])
+def test_explicit_id_must_be_ascii_slug(bad):
+    with pytest.raises(DirtreeError, match=r"may only use \[A-Za-z0-9_-\]"):
+        render(tree(f"nodes:\n  - label: a\n    id: {bad}\n"))
+
+
 def test_duplicate_explicit_id_is_error():
     with pytest.raises(DirtreeError, match="duplicate id 'x'"):
         render(tree("nodes:\n  - label: a\n    id: x\n  - label: b\n    id: x\n"))
