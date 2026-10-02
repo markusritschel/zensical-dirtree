@@ -11,6 +11,8 @@ the previous version's inlined stylesheet and script). Re-run
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-02
+
 First release.
 
 ### Added
@@ -37,4 +39,5 @@ First release.
   Content Security Policy, `inline_assets = false` and
   `zensical-dirtree install` copy them into `docs/` instead.
 
-[Unreleased]: https://github.com/markusritschel/zensical-dirtree/commits/develop
+[Unreleased]: https://github.com/markusritschel/zensical-dirtree/compare/v0.1.0...develop
+[0.1.0]: https://github.com/markusritschel/zensical-dirtree/releases/tag/v0.1.0
