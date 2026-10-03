@@ -86,7 +86,8 @@ One-time setup (by the maintainer, not in the repo):
    `zensical-dirtree`, owner `markusritschel`, repository `zensical-dirtree`,
    workflow `release.yml`, environment `testpypi` / `pypi` respectively.
 4. In the repo settings, set Pages > Source to "GitHub Actions" (Pages on a
-   free plan needs a public repo).
+   free plan needs a public repo), then under Environments > `github-pages`
+   add the tag rule `v*`: by default only the default branch may deploy.
 
 Each release (git-flow: `develop` integrates, `main` holds releases):
 
