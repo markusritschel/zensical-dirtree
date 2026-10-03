@@ -14,7 +14,7 @@ __all__ = [
     "asset_path",
     "makeExtension",
 ]
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 #: Bundled assets, in the order they should be registered.
 ASSETS = ("dirtree.css", "dirtree.js")

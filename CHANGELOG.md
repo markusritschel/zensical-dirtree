@@ -9,7 +9,20 @@ the previous version's inlined stylesheet and script). Re-run
 `zensical-dirtree schema --output …` if you use tree files, and
 `zensical-dirtree install --docs-dir docs` if you set `inline_assets = false`.
 
-## [Unreleased]
+## [1.0.0] - 2026-10-03
+
+### Added
+
+- Screenshot to README
+- Documentation link to pyproject.toml
+
+## [0.1.1] - 2026-10-03
+
+### Added
+
+- The example site is published at
+  <https://markusritschel.github.io/zensical-dirtree/> and linked from the
+  README and the package metadata.
 
 ## [0.1.0] - 2026-10-02
 
@@ -39,5 +52,6 @@ First release.
   Content Security Policy, `inline_assets = false` and
   `zensical-dirtree install` copy them into `docs/` instead.
 
-[Unreleased]: https://github.com/markusritschel/zensical-dirtree/compare/v0.1.0...develop
+[Unreleased]: https://github.com/markusritschel/zensical-dirtree/compare/v0.1.1...develop
+[0.1.1]: https://github.com/markusritschel/zensical-dirtree/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/markusritschel/zensical-dirtree/releases/tag/v0.1.0
