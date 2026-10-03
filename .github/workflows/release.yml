@@ -49,27 +49,25 @@ jobs:
           name: dist
           path: dist/
 
-  testpypi:
+  test-pypi:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     environment:
       name: testpypi
       url: https://test.pypi.org/p/zensical-dirtree
-    permissions:
-      id-token: write
     steps:
+      - uses: astral-sh/setup-uv@v10.2.0
       - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          # Re-running a release after a failure later on must not stop here.
-          skip-existing: true
+      # Re-running a release after a failure later on must not stop here.
+      - run: uv publish --publish-url https://test.pypi.org/legacy/ --check-url https://test.pypi.org/simple/
 
   pypi:
-    needs: testpypi
+    needs: test-pypi
     runs-on: ubuntu-latest
     environment:
       # Add yourself as a required reviewer on this environment to approve
@@ -79,8 +77,10 @@ jobs:
     permissions:
       id-token: write
     steps:
+      - uses: astral-sh/setup-uv@v10.2.0
       - uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      # Defaults to PyPI's upload endpoint (https://upload.pypi.org/legacy/).
+      - run: uv publish --check-url https://pypi.org/simple/
