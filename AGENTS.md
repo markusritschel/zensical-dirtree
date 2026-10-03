@@ -73,6 +73,8 @@ package check (build the example with only the built wheel installed) on
 pushes to `main`/`develop` and on pull requests; a weekly run repeats the tests
 against the newest Zensical. `.github/workflows/release.yml` publishes on a
 `v*` tag: TestPyPI first, then PyPI, both via Trusted Publishing (no tokens).
+`.github/workflows/docs.yml` deploys the example site to GitHub Pages on the
+same tags (or by hand), separately so a Pages failure cannot block a release.
 
 One-time setup (by the maintainer, not in the repo):
 
@@ -83,6 +85,8 @@ One-time setup (by the maintainer, not in the repo):
 3. On test.pypi.org and pypi.org, add a *pending* trusted publisher: project
    `zensical-dirtree`, owner `markusritschel`, repository `zensical-dirtree`,
    workflow `release.yml`, environment `testpypi` / `pypi` respectively.
+4. In the repo settings, set Pages > Source to "GitHub Actions" (Pages on a
+   free plan needs a public repo).
 
 Each release (git-flow: `develop` integrates, `main` holds releases):
 

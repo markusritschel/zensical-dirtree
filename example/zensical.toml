@@ -1,5 +1,6 @@
 [project]
 site_name = "zensical-dirtree example"
+site_url = "https://markusritschel.github.io/zensical-dirtree/"
 docs_dir = "docs"
 # base_path below lives outside docs/. Zensical caches pages by their own
 # source, so without this line edits to body files are ignored by both

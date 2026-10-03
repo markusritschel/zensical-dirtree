@@ -1,0 +1,47 @@
+name: Docs
+
+# Publishes the example site to GitHub Pages as a live demo. It deploys on
+# release tags so the demo matches the version on PyPI. It is kept out of
+# release.yml so that a Pages failure cannot block a PyPI upload. One-time
+# setup: Settings > Pages > Source = "GitHub Actions".
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+      - name: Build the example site
+        working-directory: example
+        run: uv run --locked zensical build --clean
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          name: documentation
+          path: example/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          artifact_name: documentation
