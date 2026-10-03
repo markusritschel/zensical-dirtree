@@ -264,7 +264,9 @@ after upgrading.
 `example/` exercises every feature: nesting, badges (named and raw colour),
 fields, `body` and `body_file`, icon overrides, status dots, two trees on one
 page, a table of deep links, a second page for instant navigation, and a tree
-loaded from a schema-checked YAML file.
+loaded from a schema-checked YAML file. The site for the latest release is
+published at <https://markusritschel.github.io/zensical-dirtree/>. To run it
+locally:
 
 ```bash
 cd example && uv run zensical serve

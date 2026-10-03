@@ -30,6 +30,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/markusritschel/zensical-dirtree"
+Documentation = "https://markusritschel.github.io/zensical-dirtree/"
 Repository = "https://github.com/markusritschel/zensical-dirtree"
 Issues = "https://github.com/markusritschel/zensical-dirtree/issues"
 Changelog = "https://github.com/markusritschel/zensical-dirtree/blob/main/CHANGELOG.md"
