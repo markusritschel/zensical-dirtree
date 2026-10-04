@@ -1,9 +1,23 @@
-# zensical-dirtree
+<p align="center">
+  
+</p>
 
-An interactive directory-tree explorer for [Zensical](https://zensical.org)
-documentation sites: a clickable tree on the left, a detail panel on the right.
-Each node's description is ordinary Markdown, so code blocks, admonitions and
-links look exactly like the rest of your page.
+<h1 align="center">zensical-dirtree</h1>
+
+
+<p align="center">
+  <b>An interactive directory-tree explorer for <a href="https://zensical.org">Zensical</a> documentation sites.</b><br/><br/>
+  A clickable tree on the left, a detail panel on the right. <br/>
+  Each node's description is ordinary Markdown, so code blocks, <br/> admonitions and links
+  look exactly like the rest of your page.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-55625f" alt="MIT licence" /></a>
+</p>
+
+
+![](screenshot-zensical-dirtree.png)
 
 The explorer is rendered to static HTML at build time. A small script (no
 dependencies) adds the interactivity, so the content is indexed by search, works
@@ -13,7 +27,8 @@ disabled.
 ## Install
 
 ```bash
-uv add zensical-dirtree          # or: pip install zensical-dirtree
+uv add zensical-dirtree          
+# or: pip install zensical-dirtree
 ```
 
 Install it into the same environment as Zensical. After upgrading, rebuild
@@ -27,25 +42,79 @@ either. The development version installs from GitHub:
 
 [changelog]: https://github.com/markusritschel/zensical-dirtree/blob/main/CHANGELOG.md
 
+
+## Usage
+
+For a minimal example, include the following snippet in your markdown page:
+
+`````yaml
+````dirtree
+root: my-project/
+nodes:
+  - label: index.html
+    id: index-html
+    summary: Main page
+    fields:
+      - label: What this is
+        value: This is the main page of the documentation.
+      - label: Format
+        value: Markdown format, rendered by Zensical.
+  - label: README.md
+    body: |
+      ```markdown
+      Some content with *emphasis* and **strong** text.
+      ```
+      !!! tip "Watch your snippets"
+          Files under `base_path` live outside `docs/`, so list them under
+          `watch` to rebuild when they change.
+    link: http://markdown.org/
+````
+`````
+
+For more examples see the [example page](https://markusritschel.github.io/zensical-dirtree).
+
+
+
 ## Configure
 
-In `zensical.toml`:
-
+Include the following toml table in your `zensical.toml`:
 ```toml
-[project]
-watch = ["snippets"]            # same as base_path; see below
-
-[project.markdown_extensions.pymdownx.superfences]
-# ... plus Zensical's other default extensions, see below
-
 [project.markdown_extensions.zensical_dirtree]
-base_path = "snippets"          # where body_file paths resolve; outside docs/
+```
+
+If you want to use badges, they need to be defined in this table as follows:
+```toml
+[project.markdown_extensions.zensical_dirtree]
+badges.local = { label = "local", color = "blue" }
 badges.committed = { label = "committed", color = "green", indicator = true }
 badges.gitignored = { label = "gitignored", color = "orange", indicator = true }
 badges.generated = { label = "generated", color = "amber" }
 ```
 
-Things to know:
+### Body files
+
+If you want to use `body_file` in your tree, that is, load the body of a node from a separate Markdown file, you need to set the `base_path` option to the directory where these files are located. 
+You should also add that directory to the `watch` option, so that Zensical rebuilds the page when a body file changes.
+Also, don't forget to create that directory relative to your project's root and put the respective files in there.
+
+For example, in `zensical.toml`:
+
+```toml
+[project]
+watch = ["snippets"]            # same as base_path; see below
+
+[project.markdown_extensions.zensical_dirtree]
+base_path = "snippets"          # where body_file paths resolve; outside docs/
+badges.local = { label = "local", color = "blue" }
+badges.committed = { label = "committed", color = "green", indicator = true }
+badges.gitignored = { label = "gitignored", color = "orange", indicator = true }
+badges.generated = { label = "generated", color = "amber" }
+```
+
+Make sure that `pymdownx.superfences` is in your `[project.markdown_extensions]` section in `zensical.toml`.
+
+
+### Things to know:
 
 - **No `custom_fences` entry needed.** The extension registers the `dirtree`
   fence with `pymdownx.superfences` itself, in whatever order the extensions
@@ -54,7 +123,7 @@ Things to know:
 - **Naming any Markdown extension replaces Zensical's defaults.** As soon as
   `zensical.toml` contains one `[project.markdown_extensions.*]` table, Zensical
   drops its whole built-in set (SuperFences, highlighting, admonitions, …).
-  List them again next to `zensical_dirtree`. Sites created with `zensical new`
+  You would need to list them again. Sites created with `zensical new`, however,
   already list them all; otherwise copy the complete default list from
   [`example/zensical.toml`](https://github.com/markusritschel/zensical-dirtree/blob/main/example/zensical.toml).
 - **No stylesheet or script to set up.** The extension inlines both before the
@@ -67,7 +136,8 @@ Things to know:
   want to replace the script, set `inline_assets = false`, run
   `zensical-dirtree install --docs-dir docs` (again after each upgrade) and
   list the two copied files in `extra_css` and `extra_javascript`.
-- **Add `base_path` to `watch`.** Zensical caches each page by its own source.
+- **Add `base_path` to `watch`** if you use snippets. 
+  Zensical caches each page by its own source.
   Without `watch`, an edited body file is ignored by `zensical serve` **and by
   `zensical build`** until the page that embeds it changes. With it, every edit
   rebuilds. The extension logs a warning when `base_path` isn't covered by
@@ -110,7 +180,7 @@ The tree pane's shading works the same way: `--dirtree-tree-bg` (and
 Use four backticks for the outer fence so bodies can contain ordinary
 triple-backtick code blocks. The content is YAML.
 
-`````markdown
+`````yaml
 ````dirtree
 root: your-project/
 nodes:
@@ -139,11 +209,11 @@ nodes:
 
 ### Top level
 
-| Key | Required | Notes |
-| --- | --- | --- |
-| `nodes` | yes | Non-empty list of nodes. |
-| `root` | no | Label shown above the tree and at the start of each breadcrumb. |
-| `contents_limit` | no | Entries a folder's "Contents" list shows before a "Show N more" button. Default: 10. Without JavaScript the full list is shown. |
+| Key  | Notes |
+| --- | --- |
+| `nodes` | **Required**. Non-empty list of nodes. |
+| `root` | Label shown above the tree and at the start of each breadcrumb. |
+| `contents_limit` | Entries a folder's "Contents" list shows before a "Show N more" button. Default: 10. Without JavaScript the full list is shown. |
 
 ### Nodes
 
@@ -192,7 +262,7 @@ For a tree loaded from a file, the message names the file too:
 A large tree, or one shown on several pages, can live in its own YAML file.
 The fence then holds a single line:
 
-````markdown
+````yaml
 ```dirtree
 src: trees/project.yaml
 ```
@@ -224,8 +294,7 @@ nodes:
   - label: …
 ```
 
-Editors with YAML language support (VS Code with the Red Hat YAML extension,
-JetBrains IDEs, Neovim with yaml-language-server) then offer completion,
+Editors with YAML language support then offer completion,
 show each key's description on hover and flag mistakes as you type. The schema
 is for editing only; the build still runs its own checks. Re-run the command
 after upgrading.
@@ -265,12 +334,7 @@ after upgrading.
 fields, `body` and `body_file`, icon overrides, status dots, two trees on one
 page, a table of deep links, a second page for instant navigation, and a tree
 loaded from a schema-checked YAML file. The site for the latest release is
-published at <https://markusritschel.github.io/zensical-dirtree/>. To run it
-locally:
-
-```bash
-cd example && uv run zensical serve
-```
+published at <https://markusritschel.github.io/zensical-dirtree/>. 
 
 ## Development
 
@@ -281,6 +345,9 @@ uv run ruff check . && uv run ruff format --check .
 uv run zensical-dirtree schema --output example/snippets/trees/dirtree.schema.json  # after editing the schema
 ```
 
-CI runs the same checks on Python 3.10–3.13, plus a build of the example site
-from the packaged wheel. Changes are recorded in `CHANGELOG.md`; the release
-process is described in `AGENTS.md`.
+## Contact & Issues
+
+For questions or issues, please contact me via git@markusritschel.de or open an [issue](https://github.com/markusritschel/oceanpack/issues).
+
+---
+&copy; Markus Ritschel 2026
