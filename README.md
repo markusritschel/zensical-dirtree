@@ -209,27 +209,27 @@ nodes:
 
 ### Top level
 
-| Key  | Notes |
-| --- | --- |
-| `nodes` | **Required**. Non-empty list of nodes. |
-| `root` | Label shown above the tree and at the start of each breadcrumb. |
+| Key              | Notes                                                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `nodes`          | **Required**. Non-empty list of nodes.                                                                                          |
+| `root`           | Label shown above the tree and at the start of each breadcrumb.                                                                 |
 | `contents_limit` | Entries a folder's "Contents" list shows before a "Show N more" button. Default: 10. Without JavaScript the full list is shown. |
 
 ### Nodes
 
-| Key | Type | Notes |
-| --- | --- | --- |
-| `label` | str | **Required.** Display name. A trailing `/` or a `children` key makes it a folder. |
-| `id` | str | Slug for deep links (`[A-Za-z0-9_-]`). Default: the slugified label path, e.g. `src/main.py` → `src-main-py`. Must be unique on the page. |
-| `summary` | str | One line under the title, also shown in the parent's "Contents" list and as a plain-text tooltip on the tree row. Inline Markdown. |
-| `body` | str | Markdown. Mutually exclusive with `body_file`. |
-| `body_file` | str | Markdown file, relative to `base_path`. |
-| `badges` | list[str] | Keys from the badge configuration. |
-| `fields` | list[{label, value}] | Label/value callouts. `value` is inline Markdown. |
-| `link` | str | Adds a "Full docs →" link. Relative `.md` links are resolved like any page link. |
-| `children` | list[node] | Makes the node a folder. |
-| `expanded` | bool | Folder starts open. Default `false`. |
-| `icon` | str | `folder`, `file`, `code`, `config` or `md`. Default: derived from type and extension. |
+| Key         | Type                 | Notes                                                                                                                                     |
+| ----------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`     | str                  | **Required.** Display name. A trailing `/` or a `children` key makes it a folder.                                                         |
+| `id`        | str                  | Slug for deep links (`[A-Za-z0-9_-]`). Default: the slugified label path, e.g. `src/main.py` → `src-main-py`. Must be unique on the page. |
+| `summary`   | str                  | One line under the title, also shown in the parent's "Contents" list and as a plain-text tooltip on the tree row. Inline Markdown.        |
+| `body`      | str                  | Markdown. Mutually exclusive with `body_file`.                                                                                            |
+| `body_file` | str                  | Markdown file, relative to `base_path`.                                                                                                   |
+| `badges`    | list[str]            | Keys from the badge configuration.                                                                                                        |
+| `fields`    | list[{label, value}] | Label/value callouts. `value` is inline Markdown.                                                                                         |
+| `link`      | str                  | Adds a "Full docs →" link. Relative `.md` links are resolved like any page link.                                                          |
+| `children`  | list[node]           | Makes the node a folder.                                                                                                                  |
+| `expanded`  | bool                 | Folder starts open. Default `false`.                                                                                                      |
+| `icon`      | str                  | `folder`, `file`, `code`, `config` or `md`. Default: derived from type and extension.                                                     |
 
 ### Ids and deep links
 
